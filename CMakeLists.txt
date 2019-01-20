@@ -22,4 +22,7 @@ if(USEFUL_BUILD_TESTS)
         PRIVATE Catch2::Catch2
         PRIVATE useful
         )
+    target_sources(unit_tests
+        PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/tests/test_ecs.cpp
+        )
 endif(USEFUL_BUILD_TESTS)
