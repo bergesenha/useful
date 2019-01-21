@@ -4,7 +4,6 @@
 #include <utility>
 
 #include <type_list.hpp>
-#include <void_t.hpp>
 
 namespace useful
 {
@@ -24,7 +23,7 @@ template <class IntType, template <IntType> class Target, IntType N>
 struct integral_specialization_defined<IntType,
                                        Target,
                                        N,
-                                       void_t<decltype(Target<N>())>>
+                                       std::void_t<decltype(Target<N>())>>
     : std::true_type
 {
 };
@@ -42,7 +41,7 @@ struct specialization_defined_impl : std::false_type
 };
 
 template <template <class...> class Target, class... Args>
-struct specialization_defined_impl<void_t<decltype(Target<Args...>())>,
+struct specialization_defined_impl<std::void_t<decltype(Target<Args...>())>,
                                    Target,
                                    Args...> : std::true_type
 {
