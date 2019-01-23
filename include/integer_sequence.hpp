@@ -1,6 +1,7 @@
 #pragma once
 
 #include <utility>
+#include "type_list.hpp"
 
 
 namespace useful
@@ -167,5 +168,118 @@ struct length<std::integer_sequence<IntType, Seq...>>
 
 template <class IntSeq>
 constexpr std::size_t length_v = length<IntSeq>::value;
+
+////////////////////////////////////////////////////////////////////////////////
+// concatenate two integer sequences
+template <class IntSeq1, class IntSeq2>
+struct concat;
+
+template <class IntType, IntType... Values1, IntType... Values2>
+struct concat<std::integer_sequence<IntType, Values1...>,
+              std::integer_sequence<IntType, Values2...>>
+{
+    typedef std::integer_sequence<IntType, Values1..., Values2...> type;
+};
+
+template <class IntSeq1, class IntSeq2>
+using concat_t = typename concat<IntSeq1, IntSeq2>::type;
+
+////////////////////////////////////////////////////////////////////////////////
+// apply ValueMetaFunction on each value in IntSeq and return it in a
+// t_list::type_list
+template <class IntSeq,
+          template <typename IntSeq::value_type>
+          class ValueMetaFunction>
+struct type_transform;
+
+
+template <class IntType,
+          IntType... Values,
+          template <IntType>
+          class ValueMetaFunction>
+struct type_transform<std::integer_sequence<IntType, Values...>,
+                      ValueMetaFunction>
+{
+    typedef t_list::type_list<ValueMetaFunction<Values>...> type;
+};
+
+
+template <class IntSeq,
+          template <typename IntSeq::value_type>
+          class ValueMetaFunction>
+using type_transform_t =
+    typename type_transform<IntSeq, ValueMetaFunction>::type;
+
+
+////////////////////////////////////////////////////////////////////////////////
+// find position index of value Value in an integer sequence
+template <class IntSeq, auto Value, std::size_t Index = 0>
+struct index_of_value;
+
+template <class IntType,
+          IntType Value,
+          IntType FirstSeq,
+          IntType... RestSeq,
+          std::size_t Index>
+struct index_of_value<std::integer_sequence<IntType, FirstSeq, RestSeq...>,
+                      Value,
+                      Index>
+    : index_of_value<std::integer_sequence<IntType, RestSeq...>,
+                     Value,
+                     Index + 1>
+{
+};
+
+template <class IntType, IntType Value, IntType... RestSeq, std::size_t Index>
+struct index_of_value<std::integer_sequence<IntType, Value, RestSeq...>,
+                      Value,
+                      Index>
+{
+    static const std::size_t value = Index;
+};
+
+template <class IntSeq, auto Value>
+constexpr std::size_t index_of_value_v = index_of_value<IntSeq, Value>::value;
+
+
+////////////////////////////////////////////////////////////////////////////////
+// instantiate BinaryTemplate with every combination of Values is IntSeq
+
+template <class IntSeq,
+          template <typename IntSeq::value_type, typename IntSeq::value_type>
+          class BinaryTemplate,
+          class Remaining = IntSeq>
+struct for_each_combination
+{
+    template <typename IntSeq::value_type V>
+    using bound_binary_template = BinaryTemplate<head_v<Remaining>, V>;
+
+    typedef type_transform_t<IntSeq, bound_binary_template> current_list;
+
+    typedef t_list::concat_t<
+        current_list,
+        typename for_each_combination<IntSeq,
+                                      BinaryTemplate,
+                                      tail_t<Remaining>>::type>
+        type;
+};
+
+template <class IntSeq,
+          template <typename IntSeq::value_type, typename IntSeq::value_type>
+          class BinaryTemplate>
+struct for_each_combination<IntSeq,
+                            BinaryTemplate,
+                            std::integer_sequence<typename IntSeq::value_type>>
+{
+    typedef t_list::type_list<> type;
+};
+
+
+template <class IntSeq,
+          template <typename IntSeq::value_type, typename IntSeq::value_type>
+          class BinaryTemplate>
+using for_each_combination_t =
+    typename for_each_combination<IntSeq, BinaryTemplate>::type;
+
 } // namespace int_seq
 } // namespace useful
