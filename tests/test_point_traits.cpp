@@ -29,3 +29,15 @@ TEST_CASE("", "")
     CHECK(x_is_float);
     CHECK(y_is_int);
 }
+
+
+TEST_CASE("", "")
+{
+    point pt1{1.0f, 2.0f, 3};
+
+    const auto xval = useful::point_traits<point>::get<0>(pt1);
+    const auto yval = useful::point_traits<point>::get<2>(pt1);
+
+    CHECK(xval == Approx(1.0f));
+    CHECK(yval == 3);
+}

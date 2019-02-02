@@ -39,18 +39,36 @@ template <class T>
 struct helper<0, T>
 {
     typedef decltype(std::declval<T>().x) type;
+
+    static type&
+    get(T& pt)
+    {
+        return pt.x;
+    }
 };
 
 template <class T>
 struct helper<1, T>
 {
     typedef decltype(std::declval<T>().y) type;
+
+    static type&
+    get(T& pt)
+    {
+        return pt.y;
+    }
 };
 
 template <class T>
 struct helper<2, T>
 {
     typedef decltype(std::declval<T>().z) type;
+
+    static type&
+    get(T& pt)
+    {
+        return pt.z;
+    }
 };
 }; // namespace xyz_detail
 
@@ -65,6 +83,13 @@ struct point_traits_<PointType,
 
     template <std::size_t U>
     using value_type = typename xyz_detail::helper<U, PointType>::type;
+
+    template <std::size_t U>
+    static value_type<U>&
+    get(PointType& pt)
+    {
+        return xyz_detail::helper<U, PointType>::get(pt);
+    }
 };
 
 
@@ -78,6 +103,13 @@ struct point_traits_<PointType,
 
     template <std::size_t U>
     using value_type = typename xyz_detail::helper<U, PointType>::type;
+
+    template <std::size_t U>
+    static value_type<U>&
+    get(PointType& pt)
+    {
+        return xyz_detail::helper<U, PointType>::get(pt);
+    }
 };
 
 
@@ -91,6 +123,14 @@ struct point_traits_<PointType,
 
     template <std::size_t U>
     using value_type = typename xyz_detail::helper<U, PointType>::type;
+
+
+    template <std::size_t U>
+    static value_type<U>&
+    get(PointType& pt)
+    {
+        return xyz_detail::helper<U, PointType>::get(pt);
+    }
 };
 
 } // namespace useful
