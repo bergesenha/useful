@@ -30,6 +30,31 @@ struct point_traits_<T[N], void, void, void>
 };
 
 
+namespace xyz_detail
+{
+template <std::size_t, class T>
+struct helper;
+
+template <class T>
+struct helper<0, T>
+{
+    typedef decltype(std::declval<T>().x) type;
+};
+
+template <class T>
+struct helper<1, T>
+{
+    typedef decltype(std::declval<T>().y) type;
+};
+
+template <class T>
+struct helper<2, T>
+{
+    typedef decltype(std::declval<T>().z) type;
+};
+}; // namespace xyz_detail
+
+
 template <class PointType, class Y, class Z>
 struct point_traits_<PointType,
                      std::void_t<decltype(std::declval<PointType>().x)>,
@@ -37,6 +62,9 @@ struct point_traits_<PointType,
                      Z>
 {
     static const std::size_t dimensions = 1;
+
+    template <std::size_t U>
+    using value_type = typename xyz_detail::helper<U, PointType>::type;
 };
 
 
@@ -47,6 +75,9 @@ struct point_traits_<PointType,
                      Z>
 {
     static const std::size_t dimensions = 2;
+
+    template <std::size_t U>
+    using value_type = typename xyz_detail::helper<U, PointType>::type;
 };
 
 
@@ -57,6 +88,9 @@ struct point_traits_<PointType,
                      std::void_t<decltype(std::declval<PointType>().z)>>
 {
     static const std::size_t dimensions = 3;
+
+    template <std::size_t U>
+    using value_type = typename xyz_detail::helper<U, PointType>::type;
 };
 
 } // namespace useful
