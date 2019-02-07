@@ -55,6 +55,11 @@ TEST_CASE("test point_traits with xyz-like point", "[point_traits]")
     const auto xval2 = useful::point_traits<point>::get<0>(pt2);
     const auto yval2 = useful::point_traits<point>::get<2>(pt2);
 
+    point pt3 = useful::add(pt1, pt2);
+
     CHECK(xval == Approx(1.0f));
     CHECK(yval == 3);
+    CHECK(pt3.x == Approx(5.0f));
+    CHECK(pt3.y == Approx(7.0f));
+    CHECK(pt3.z == Approx(63));
 }

@@ -2,6 +2,7 @@
 
 #include <cstddef>
 #include <type_traits>
+#include <iterator>
 
 namespace useful
 {
@@ -158,4 +159,58 @@ struct point_traits_<PointType,
     }
 };
 
+} // namespace useful
+
+
+namespace useful
+{
+
+namespace point_traits_detail
+{
+template <class PointType,
+          std::size_t N = point_traits<PointType>::dimensions - 1>
+struct helper
+{
+    static void
+    add(const PointType& lhs, const PointType& rhs, PointType& out)
+    {
+        point_traits<PointType>::template get<N>(out) =
+            point_traits<PointType>::template get<N>(lhs) +
+            point_traits<PointType>::template get<N>(rhs);
+
+        helper<PointType, N - 1>::add(lhs, rhs, out);
+    }
+};
+
+
+template <class PointType>
+struct helper<PointType, 0>
+{
+    static void
+    add(const PointType& lhs, const PointType& rhs, PointType& out)
+    {
+        point_traits<PointType>::template get<0>(out) =
+            point_traits<PointType>::template get<0>(lhs) +
+            point_traits<PointType>::template get<0>(rhs);
+    }
+};
+} // namespace point_traits_detail
+
+template <class PointType>
+PointType
+add(const PointType& lhs, const PointType& rhs)
+{
+    PointType out;
+
+    point_traits_detail::helper<PointType>::add(lhs, rhs, out);
+
+    return out;
+}
+
+
+template <class Iterator>
+typename std::iterator_traits<Iterator>::value_type
+arithmetic_mean(Iterator first, Iterator last)
+{
+}
 } // namespace useful
