@@ -47,9 +47,13 @@ TEST_CASE("test point_traits with array-type point", "[point_traits]")
 TEST_CASE("test point_traits with xyz-like point", "[point_traits]")
 {
     point pt1{1.0f, 2.0f, 3};
+    const point pt2{4.0f, 5.0f, 60};
 
     const auto xval = useful::point_traits<point>::get<0>(pt1);
     const auto yval = useful::point_traits<point>::get<2>(pt1);
+
+    const auto xval2 = useful::point_traits<point>::get<0>(pt2);
+    const auto yval2 = useful::point_traits<point>::get<2>(pt2);
 
     CHECK(xval == Approx(1.0f));
     CHECK(yval == 3);
