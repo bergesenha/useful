@@ -192,6 +192,15 @@ struct helper
 
         helper<PointType, N - 1>::divide(lhs, rhs, out);
     }
+
+    template <class Function>
+    static void
+    apply(PointType& pt, Function f)
+    {
+        f(point_traits<PointType>::template get<N>(pt));
+
+        helper<PointType, N - 1>::apply(pt, f);
+    }
 };
 
 
@@ -212,6 +221,13 @@ struct helper<PointType, 0>
     {
         point_traits<PointType>::template get<0>(out) =
             point_traits<PointType>::template get<0>(lhs) / rhs;
+    }
+
+    template <class Function>
+    static void
+    apply(PointType& pt, Function f)
+    {
+        f(point_traits<PointType>::template get<0>(pt));
     }
 };
 } // namespace point_traits_detail
@@ -252,4 +268,12 @@ arithmetic_mean(Iterator first, Iterator last)
 
     return divide(out, n);
 }
+
+template <class PointType, class Function>
+void
+apply(PointType& pt, Function fun)
+{
+    point_traits_detail::helper<PointType>::apply(pt, fun);
+}
+
 } // namespace useful

@@ -63,6 +63,15 @@ TEST_CASE("test point_traits with xyz-like point", "[point_traits]")
     CHECK(pt3.x == Approx(5.0f));
     CHECK(pt3.y == Approx(7.0f));
     CHECK(pt3.z == Approx(63));
+
+    SECTION("apply a function to each dimension")
+    {
+        useful::apply(pt1, [](auto& elm) { elm *= 2; });
+
+        CHECK(pt1.x == Approx(2.0f));
+        CHECK(pt1.y == Approx(4.0f));
+        CHECK(pt1.z == 6);
+    }
 }
 
 
