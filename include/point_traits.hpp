@@ -3,6 +3,8 @@
 #include <cstddef>
 #include <type_traits>
 #include <iterator>
+#include <algorithm>
+#include <numeric>
 
 namespace useful
 {
@@ -240,5 +242,14 @@ template <class Iterator>
 typename std::iterator_traits<Iterator>::value_type
 arithmetic_mean(Iterator first, Iterator last)
 {
+    const auto n = std::distance(first, last);
+
+    typedef typename std::iterator_traits<Iterator>::value_type point_type;
+    point_type out(*first++);
+
+
+    out = std::accumulate(first, last, out, &add<point_type>);
+
+    return divide(out, n);
 }
 } // namespace useful

@@ -1,4 +1,4 @@
-
+#include <vector>
 
 #include <catch2/catch.hpp>
 #include <point_traits.hpp>
@@ -57,9 +57,20 @@ TEST_CASE("test point_traits with xyz-like point", "[point_traits]")
 
     point pt3 = useful::add(pt1, pt2);
 
+
     CHECK(xval == Approx(1.0f));
     CHECK(yval == 3);
     CHECK(pt3.x == Approx(5.0f));
     CHECK(pt3.y == Approx(7.0f));
     CHECK(pt3.z == Approx(63));
+}
+
+
+TEST_CASE("test point algorithms with a range of points", "[point_traits]")
+{
+    std::vector<point> pvec{{1.0f, 2.0f, 3}, {2.0f, 1.0f, 2}, {3.0f, 3.0f, 1}};
+
+    auto res = useful::arithmetic_mean(pvec.begin(), pvec.end());
+
+    CHECK(res.x == Approx(2.0f));
 }
