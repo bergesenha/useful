@@ -14,7 +14,7 @@ struct point2d
     float x, y;
 };
 
-TEST_CASE("", "")
+TEST_CASE("test point_traits with xyz-like struct", "[point_traits]")
 {
     constexpr std::size_t dims = useful::point_traits<point>::dimensions;
     constexpr std::size_t dims2d = useful::point_traits<point2d>::dimensions;
@@ -24,14 +24,27 @@ TEST_CASE("", "")
     constexpr bool y_is_int =
         std::is_same<int, useful::point_traits<point>::value_type<2>>::value;
 
+
     CHECK(dims == 3);
     CHECK(dims2d == 2);
     CHECK(x_is_float);
     CHECK(y_is_int);
 }
 
+TEST_CASE("test point_traits with array-type point", "[point_traits]")
+{
+    float pt1[3] = {4.0f, 5.0f, 6.0f};
 
-TEST_CASE("", "")
+    constexpr std::size_t dims =
+        useful::point_traits<decltype(pt1)>::dimensions;
+
+    float elm1 = useful::point_traits<decltype(pt1)>::get<0>(pt1);
+
+    CHECK(dims == 3);
+    CHECK(elm1 == Approx(4.0f));
+}
+
+TEST_CASE("test point_traits with xyz-like point", "[point_traits]")
 {
     point pt1{1.0f, 2.0f, 3};
 
