@@ -180,6 +180,16 @@ struct helper
 
         helper<PointType, N - 1>::add(lhs, rhs, out);
     }
+
+    template <class Arithmetic>
+    static void
+    divide(const PointType& lhs, Arithmetic rhs, PointType& out)
+    {
+        point_traits<PointType>::template get<N>(out) =
+            point_traits<PointType>::template get<N>(lhs) / rhs;
+
+        helper<PointType, N - 1>::divide(lhs, rhs, out);
+    }
 };
 
 
@@ -192,6 +202,14 @@ struct helper<PointType, 0>
         point_traits<PointType>::template get<0>(out) =
             point_traits<PointType>::template get<0>(lhs) +
             point_traits<PointType>::template get<0>(rhs);
+    }
+
+    template <class Arithmetic>
+    static void
+    divide(const PointType& lhs, Arithmetic rhs, PointType& out)
+    {
+        point_traits<PointType>::template get<0>(out) =
+            point_traits<PointType>::template get<0>(lhs) / rhs;
     }
 };
 } // namespace point_traits_detail
@@ -207,6 +225,16 @@ add(const PointType& lhs, const PointType& rhs)
     return out;
 }
 
+template <class PointType, class Arithmetic>
+PointType
+divide(const PointType& lhs, Arithmetic rhs)
+{
+    PointType out;
+
+    point_traits_detail::helper<PointType>::divide(lhs, rhs, out);
+
+    return out;
+}
 
 template <class Iterator>
 typename std::iterator_traits<Iterator>::value_type
