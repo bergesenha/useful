@@ -8,7 +8,8 @@
 
 namespace useful
 {
-
+namespace multidim
+{
 template <class PointType, class, class, class>
 struct point_traits_;
 
@@ -160,11 +161,13 @@ struct point_traits_<PointType,
         return xyz_detail::helper<U, PointType>::get(pt);
     }
 };
-
+} // namespace multidim
 } // namespace useful
 
 
 namespace useful
+{
+namespace multidim
 {
 
 namespace point_traits_detail
@@ -320,4 +323,5 @@ apply(PointType& pt, Function fun)
 }
 
 
+} // namespace multidim
 } // namespace useful
