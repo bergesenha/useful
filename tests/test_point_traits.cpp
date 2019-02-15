@@ -57,12 +57,15 @@ TEST_CASE("test point_traits with xyz-like point", "[point_traits]")
 
     point pt3 = useful::add(pt1, pt2);
 
+    bool pt1_2_less_pt2_2 = useful::less(pt1, pt2, 2);
+
 
     CHECK(xval == Approx(1.0f));
     CHECK(yval == 3);
     CHECK(pt3.x == Approx(5.0f));
     CHECK(pt3.y == Approx(7.0f));
     CHECK(pt3.z == Approx(63));
+    CHECK(pt1_2_less_pt2_2);
 
     SECTION("apply a function to each dimension")
     {
