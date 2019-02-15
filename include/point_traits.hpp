@@ -8,7 +8,8 @@
 
 namespace useful
 {
-
+namespace multidim
+{
 template <class PointType, class, class, class>
 struct point_traits_;
 
@@ -160,11 +161,13 @@ struct point_traits_<PointType,
         return xyz_detail::helper<U, PointType>::get(pt);
     }
 };
-
+} // namespace multidim
 } // namespace useful
 
 
 namespace useful
+{
+namespace multidim
 {
 
 namespace point_traits_detail
@@ -230,7 +233,50 @@ struct helper<PointType, 0>
         f(point_traits<PointType>::template get<0>(pt));
     }
 };
+
+
+template <class PointType,
+          std::size_t N = 0,
+          std::size_t DimMax = point_traits<PointType>::dimensions - 1>
+struct compare_helper
+{
+    static bool
+    less(const PointType& lhs, const PointType& rhs, std::size_t dim)
+    {
+        if(N != dim)
+        {
+            return compare_helper<PointType, N + 1, DimMax>::less(
+                lhs, rhs, dim);
+        }
+
+        return point_traits<PointType>::template get<N>(lhs) <
+               point_traits<PointType>::template get<N>(rhs);
+    }
+};
+
+
+template <class PointType, std::size_t DimMax>
+struct compare_helper<PointType, DimMax, DimMax>
+{
+    static bool
+    less(const PointType& lhs, const PointType& rhs, std::size_t dim)
+    {
+        return point_traits<PointType>::template get<DimMax>(lhs) <
+               point_traits<PointType>::template get<DimMax>(rhs);
+    }
+};
+
+
 } // namespace point_traits_detail
+
+
+template <class PointType>
+bool
+less(const PointType& lhs, const PointType& rhs, std::size_t dim)
+{
+    return point_traits_detail::compare_helper<PointType>::less(lhs, rhs, dim);
+}
+
 
 template <class PointType>
 PointType
@@ -276,4 +322,6 @@ apply(PointType& pt, Function fun)
     point_traits_detail::helper<PointType>::apply(pt, fun);
 }
 
+
+} // namespace multidim
 } // namespace useful
