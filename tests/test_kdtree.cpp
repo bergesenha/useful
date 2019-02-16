@@ -22,5 +22,12 @@ TEST_CASE("default construct a kdtree", "[multidim::kdtree]")
 
         CHECK(kdt.empty() == false);
         CHECK(kdt.size() == 1);
+
+        SECTION("insert another point")
+        {
+            kdt.insert(point_type{1.0f, -1.0f, 1.0f});
+
+            CHECK(kdt.size() == 2);
+        }
     }
 }
