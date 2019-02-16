@@ -1,7 +1,8 @@
 #pragma once
 
+#include <vector>
 #include "point_traits.hpp"
-#include "stable_container.hpp"
+
 
 namespace useful
 {
@@ -10,29 +11,48 @@ namespace multidim
 template <class PointType>
 class kdtree
 {
-    struct node;
-
 public:
-    typedef typename stable_vector<node>::size_type size_type;
+    typedef typename std::vector<PointType>::size_type size_type;
+    typedef typename std::vector<PointType>::iterator unsorted_iterator;
+    typedef
+        typename std::vector<PointType>::const_iterator const_unsorted_iterator;
 
 private:
-    struct node
+    struct record
     {
-        PointType value;
-        stable_vector<node>* storage_ref_;
+        size_type value;
+        size_type parent;
         size_type smaller;
         size_type bigger;
     };
 
 public:
-    bool
-    empty() const
+    unsorted_iterator
+    begin()
     {
-        return storage_.size() == 0;
+        return dense_.begin();
+    }
+
+    unsorted_iterator
+    end()
+    {
+        return dense_.end();
+    }
+
+    const_unsorted_iterator
+    cbegin() const
+    {
+        return dense_.cbegin();
+    }
+
+    const_unsorted_iterator
+    cend() const
+    {
+        return dense_.cend();
     }
 
 private:
-    stable_vector<node> storage_;
+    std::vector<PointType> dense_;
 };
 } // namespace multidim
 } // namespace useful
