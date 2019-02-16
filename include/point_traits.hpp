@@ -112,6 +112,13 @@ struct point_traits_<PointType,
     {
         return xyz_detail::helper<U, PointType>::get(pt);
     }
+
+    template <std::size_t U>
+    static const value_type<U>&
+    get(const PointType& pt)
+    {
+        return xyz_detail::helper<U, PointType>::get(pt);
+    }
 };
 
 
@@ -129,6 +136,13 @@ struct point_traits_<PointType,
     template <std::size_t U>
     static value_type<U>&
     get(PointType& pt)
+    {
+        return xyz_detail::helper<U, PointType>::get(pt);
+    }
+
+    template <std::size_t U>
+    static const value_type<U>&
+    get(const PointType& pt)
     {
         return xyz_detail::helper<U, PointType>::get(pt);
     }
