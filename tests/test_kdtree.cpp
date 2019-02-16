@@ -2,6 +2,25 @@
 #include <kdtree.hpp>
 
 
+struct point_type
+{
+    float x, y, z;
+};
+
+using useful::multidim::kdtree;
+
 TEST_CASE("default construct a kdtree", "[multidim::kdtree]")
 {
+    kdtree<point_type> kdt;
+
+    REQUIRE(kdt.empty());
+    REQUIRE(kdt.size() == 0);
+
+    SECTION("insert first point")
+    {
+        kdt.insert(point_type{0.0f, 0.0f, 0.0f});
+
+        CHECK(kdt.empty() == false);
+        CHECK(kdt.size() == 1);
+    }
 }

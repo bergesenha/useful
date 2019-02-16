@@ -25,5 +25,6 @@ if(USEFUL_BUILD_TESTS)
     target_sources(unit_tests
         PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/tests/test_ecs.cpp
         PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/tests/test_point_traits.cpp
+        PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/tests/test_kdtree.cpp
         )
 endif(USEFUL_BUILD_TESTS)
