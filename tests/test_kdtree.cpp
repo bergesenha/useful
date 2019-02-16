@@ -4,7 +4,7 @@
 
 struct point_type
 {
-    float x, y, z;
+    float x, y;
 };
 
 using useful::multidim::kdtree;
@@ -18,14 +18,14 @@ TEST_CASE("default construct a kdtree", "[multidim::kdtree]")
 
     SECTION("insert first point")
     {
-        kdt.insert(point_type{0.0f, 0.0f, 0.0f});
+        kdt.insert(point_type{0.0f, 0.0f});
 
         CHECK(kdt.empty() == false);
         CHECK(kdt.size() == 1);
 
         SECTION("insert another point")
         {
-            kdt.insert(point_type{1.0f, -1.0f, 1.0f});
+            kdt.insert(point_type{1.0f, -1.0f});
 
             CHECK(kdt.size() == 2);
         }

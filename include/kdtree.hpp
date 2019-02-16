@@ -22,20 +22,101 @@ private:
     struct record
     {
         record() = default;
-        record(size_type val, size_type small, size_type big)
-            : value(val), smaller(small), bigger(big)
+        record(size_type small, size_type big) : smaller(small), bigger(big)
         {
         }
 
-        size_type value;
         size_type smaller;
         size_type bigger;
     };
 
 
     void
-    insert_helper(const PointType& pt, size_type level)
+    insert_helper(const PointType& pt, size_type index, size_type level)
     {
+        if(level >= point_traits<PointType>::dimensions)
+        {
+            level = 0ul;
+        }
+        else
+        {
+            ++level;
+        }
+
+        const record& current = sparse_[index];
+
+        if(less(pt, dense_[index], level))
+        {
+            if(current.smaller)
+            {
+                // recurse
+                insert_helper(pt, current.smaller, level);
+            }
+            else
+            {
+                // insert leaf
+                const auto smaller_index = dense_.size();
+                parallel_push_back(pt, 0ul, 0ul);
+                sparse_[index].smaller = smaller_index;
+            }
+        }
+        else
+        {
+            if(current.bigger)
+            {
+                insert_helper(pt, current.bigger, level);
+            }
+            else
+            {
+                const auto bigger_index = dense_.size();
+                parallel_push_back(pt, 0ul, 0ul);
+                sparse_[index].bigger = bigger_index;
+            }
+        }
+    }
+
+    void
+    insert_helper(PointType&& pt, size_type index, size_type level)
+    {
+        if(level >= point_traits<PointType>::dimensions)
+        {
+            level = 0ul;
+        }
+        else
+        {
+            ++level;
+        }
+
+        const record& current = sparse_[index];
+
+        if(less(pt, dense_[index], level))
+        {
+            if(current.smaller)
+            {
+                // recurse
+                insert_helper(std::move(pt), current.smaller, level);
+            }
+            else
+            {
+                // insert leaf
+                const auto smaller_index = dense_.size();
+                parallel_push_back(std::move(pt), 0ul, 0ul);
+                sparse_[index].smaller = smaller_index;
+            }
+        }
+        else
+        {
+            if(current.bigger)
+            {
+                insert_helper(std::move(pt), current.bigger, level);
+            }
+            else
+            {
+                const auto bigger_index = dense_.size();
+                parallel_push_back(std::move(pt), 0ul, 0ul);
+                sparse_[index].bigger = bigger_index;
+            }
+        }
     }
 
     template <class... RecordArgs>
@@ -99,7 +180,11 @@ public:
     {
         if(dense_.empty())
         {
-            parallel_push_back(pt, 0ul, 0ul, 0ul);
+            parallel_push_back(pt, 0ul, 0ul);
+        }
+        else
+        {
+            insert_helper(pt, 0ul, 0ul);
         }
     }
 
@@ -108,7 +193,11 @@ public:
     {
         if(dense_.empty())
         {
-            parallel_push_back(std::move(pt), 0ul, 0ul, 0ul);
+            parallel_push_back(std::move(pt), 0ul, 0ul);
+        }
+        else
+        {
+            insert_helper(std::move(pt), 0ul, 0ul);
         }
     }
 
