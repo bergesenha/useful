@@ -136,9 +136,38 @@ private:
     }
 
 public:
-    kdtree() = default;
+    class ordered_iterator
+    {
+    public:
+        typedef PointType value_type;
+        typedef PointType* pointer;
+        typedef const PointType* const_pointer;
+        typedef PointType& reference;
+        typedef const PointType& const_reference;
+        typedef std::make_signed_t<size_type> difference_type;
+
+    public:
+        ordered_iterator() = default;
+
+        reference operator*()
+        {
+            return tree_ref_->dense_[current_node_];
+        }
+
+        reference operator->()
+        {
+            return &(*this);
+        }
+
+    private:
+        kdtree* tree_ref_;
+        size_type current_node_;
+    };
 
 public:
+    kdtree() = default;
+
+
     bool
     empty() const
     {
