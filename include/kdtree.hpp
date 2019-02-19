@@ -170,6 +170,18 @@ public:
             return &(ref_->dense_[current_]);
         }
 
+        bool
+        operator==(const depth_iterator& other) const
+        {
+            return current_ == other.current_;
+        }
+
+        bool
+        operator!=(const depth_iterator& other) const
+        {
+            return current_ != other.current_;
+        }
+
         depth_iterator&
         operator++()
         {
@@ -200,6 +212,7 @@ public:
 
                 if(visit_stack_.empty())
                 {
+                    current_ = 0;
                     return *this;
                 }
 
@@ -263,6 +276,12 @@ public:
     depth_begin()
     {
         return depth_iterator(0ul, this);
+    }
+
+    depth_iterator
+    depth_end()
+    {
+        return depth_iterator();
     }
 
     void
