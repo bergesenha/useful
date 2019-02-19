@@ -136,37 +136,21 @@ private:
     }
 
 public:
-    class ordered_iterator
+    class depth_iterator
     {
     public:
-        typedef PointType value_type;
-        typedef PointType* pointer;
-        typedef const PointType* const_pointer;
-        typedef PointType& reference;
-        typedef const PointType& const_reference;
-        typedef std::make_signed_t<size_type> difference_type;
-
-    public:
-        ordered_iterator() = default;
-
-        reference operator*()
+        depth_iterator&
+        operator++()
         {
-            return tree_ref_->dense_[current_node_];
-        }
-
-        reference operator->()
-        {
-            return &(*this);
         }
 
     private:
-        kdtree* tree_ref_;
-        size_type current_node_;
+        kdtree* ref_;
+        size_type current_;
     };
 
 public:
     kdtree() = default;
-
 
     bool
     empty() const
@@ -229,6 +213,7 @@ public:
             insert_helper(std::move(pt), 0ul, 0ul);
         }
     }
+
 
 private:
     std::vector<PointType> dense_;
