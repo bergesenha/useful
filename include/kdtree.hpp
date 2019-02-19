@@ -258,6 +258,12 @@ public:
         return dense_.cend();
     }
 
+    depth_iterator
+    depth_begin()
+    {
+        return depth_iterator(0ul, this);
+    }
+
     void
     insert(const PointType& pt)
     {
