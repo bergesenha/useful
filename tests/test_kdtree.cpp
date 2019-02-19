@@ -38,7 +38,7 @@ TEST_CASE("default construct a kdtree", "[multidim::kdtree]")
                     ++iter;
 
                     CHECK(iter->x == Approx(1.0f));
-                    CHECK(iter->y == Approx(1.0f));
+                    CHECK(iter->y == Approx(-1.0f));
                 }
             }
         }

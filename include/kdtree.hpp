@@ -156,7 +156,7 @@ public:
         depth_iterator() = default;
 
         depth_iterator(size_type curr, kdtree* ref)
-            : visit_stack_(), ref_(ref), current_(curr)
+            : visit_stack_{state::none_visited}, ref_(ref), current_(curr)
         {
         }
 
