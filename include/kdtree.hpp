@@ -22,12 +22,14 @@ private:
     struct record
     {
         record() = default;
-        record(size_type small, size_type big) : smaller(small), bigger(big)
+        record(size_type small, size_type big, size_type par)
+            : smaller(small), bigger(big), parent(par)
         {
         }
 
         size_type smaller;
         size_type bigger;
+        size_type parent;
     };
 
 
@@ -56,7 +58,7 @@ private:
             {
                 // insert leaf
                 const auto smaller_index = dense_.size();
-                parallel_push_back(pt, 0ul, 0ul);
+                parallel_push_back(pt, 0ul, 0ul, current.smaller);
                 sparse_[index].smaller = smaller_index;
             }
         }
@@ -69,7 +71,7 @@ private:
             else
             {
                 const auto bigger_index = dense_.size();
-                parallel_push_back(pt, 0ul, 0ul);
+                parallel_push_back(pt, 0ul, 0ul, current.bigger);
                 sparse_[index].bigger = bigger_index;
             }
         }
@@ -100,7 +102,7 @@ private:
             {
                 // insert leaf
                 const auto smaller_index = dense_.size();
-                parallel_push_back(std::move(pt), 0ul, 0ul);
+                parallel_push_back(std::move(pt), 0ul, 0ul, current.smaller);
                 sparse_[index].smaller = smaller_index;
             }
         }
@@ -113,7 +115,7 @@ private:
             else
             {
                 const auto bigger_index = dense_.size();
-                parallel_push_back(std::move(pt), 0ul, 0ul);
+                parallel_push_back(std::move(pt), 0ul, 0ul, current.bigger);
                 sparse_[index].bigger = bigger_index;
             }
         }
@@ -193,7 +195,7 @@ public:
     {
         if(dense_.empty())
         {
-            parallel_push_back(pt, 0ul, 0ul);
+            parallel_push_back(pt, 0ul, 0ul, 0ul);
         }
         else
         {
@@ -206,7 +208,7 @@ public:
     {
         if(dense_.empty())
         {
-            parallel_push_back(std::move(pt), 0ul, 0ul);
+            parallel_push_back(std::move(pt), 0ul, 0ul, 0ul);
         }
         else
         {
