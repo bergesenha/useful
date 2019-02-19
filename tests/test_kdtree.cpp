@@ -59,6 +59,13 @@ TEST_CASE("default construct a kdtree", "[multidim::kdtree]")
 
             CHECK(iter->x == Approx(0.0f));
             CHECK(iter->y == Approx(0.0f));
+
+            SECTION("increment past end")
+            {
+                ++iter;
+
+                CHECK(iter == kdt.depth_end());
+            }
         }
     }
 }
