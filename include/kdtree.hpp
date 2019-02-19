@@ -148,6 +148,13 @@ public:
         };
 
     public:
+        depth_iterator() = default;
+
+        depth_iterator(size_type curr, kdtree* ref)
+            : visit_stack_(), ref_(ref), current_(curr)
+        {
+        }
+
         depth_iterator&
         operator++()
         {
