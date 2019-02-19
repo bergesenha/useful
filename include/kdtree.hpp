@@ -17,6 +17,7 @@ public:
     typedef typename std::vector<PointType>::iterator unsorted_iterator;
     typedef
         typename std::vector<PointType>::const_iterator const_unsorted_iterator;
+    typedef PointType value_type;
 
 private:
     struct record
