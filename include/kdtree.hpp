@@ -140,13 +140,60 @@ private:
 public:
     class depth_iterator
     {
+        enum class state
+        {
+            none_visited,
+            smaller_visited,
+            bigger_visited
+        };
+
     public:
         depth_iterator&
         operator++()
         {
+            const record& rec = ref_->sparse_[current_];
+
+            if(visit_stack_.back() == state::smaller_visited)
+            {
+                // down bigger branch
+                visit_stack_.back() = state::bigger_visited;
+                visit_stack_.push_back(state::none_visited);
+                current_ = rec.bigger;
+
+                return *this;
+            }
+
+            if(visit_stack_.back() == state::bigger_visited)
+            {
+                // backtrack
+                current_ = rec.parent;
+                visit_stack_.pop_back();
+
+                while(visit_stack_.back() == state::bigger_visited &&
+                      visit_stack_.empty() != true)
+                {
+                    current_ = ref_->sparse_[current_].parent;
+                    visit_stack_.pop_back();
+                }
+
+                if(visit_stack_.empty())
+                {
+                    return *this;
+                }
+
+                return ++(*this);
+            }
+
+            // down smaller branch
+            visit_stack_.back() = state::smaller_visited;
+            visit_stack_.push_back(state::none_visited);
+            current_ = rec.smaller;
+
+            return *this;
         }
 
     private:
+        std::vector<state> visit_stack_;
         kdtree* ref_;
         size_type current_;
     };
