@@ -148,11 +148,25 @@ public:
         };
 
     public:
+        typedef value_type& reference;
+        typedef value_type* pointer;
+
+    public:
         depth_iterator() = default;
 
         depth_iterator(size_type curr, kdtree* ref)
             : visit_stack_(), ref_(ref), current_(curr)
         {
+        }
+
+        reference operator*()
+        {
+            return ref_->dense_[current_];
+        }
+
+        pointer operator->()
+        {
+            return &(ref_->dense_[current_]);
         }
 
         depth_iterator&
