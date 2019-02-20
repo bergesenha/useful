@@ -147,6 +147,20 @@ public:
         };
 
     public:
+        depth_iterator() = default;
+
+        depth_iterator(kdtree* ref, size_type current)
+            : depth_stack_(), ref_(ref), current_(current)
+        {
+        }
+
+        depth_iterator(const std::vector<state>& depth_stack,
+                       kdtree* ref,
+                       size_type current)
+            : depth_stack_(depth_stack), ref_(ref), current_(current)
+        {
+        }
+
         depth_iterator&
         operator++()
         {
