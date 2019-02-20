@@ -165,6 +165,11 @@ public:
         depth_iterator&
         operator++()
         {
+            if(depth_stack_.empty())
+            {
+                ++current_;
+                return *this;
+            }
         }
 
         bool
