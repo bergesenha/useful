@@ -174,11 +174,39 @@ public:
             {
                 switch(depth_stack_.back())
                 {
+                    // go down smaller branch if there is one
+                    case state::unvisited:
+                        if(ref_->sparse_[current_].smaller)
+                        {
+                            // go down smaller branch
+                        }
+                        else
+                        {
+                            // set smaller as visited and recurse
+                            depth_stack_.back() = state::smaller_visited;
+                            return operator++();
+                        }
+                        break;
+
+                    // go down bigger branch if there is one
+                    case state::smaller_visited:
+                        if(ref_->sparse_[current_].bigger)
+                        {
+                            // go down bigger branch
+                        }
+                        else
+                        {
+                            // set node as visited and recurse
+                            depth_stack_.back() = state::visited;
+                            return operator++();
+                        }
+                        break;
 
                     case state::visited:
                         // go up to parent and recurse
                         current_ = ref_->sparse_[current_].parent;
                         depth_stack_.pop_back();
+                        return operator++();
                         break;
                 }
             }
