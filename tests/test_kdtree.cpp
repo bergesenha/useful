@@ -13,8 +13,10 @@ TEST_CASE("default construct a kdtree", "[multidim::kdtree]")
 {
     kdtree<point_type> kdt;
 
-    REQUIRE(kdt.empty());
-    REQUIRE(kdt.size() == 0);
+    CHECK(kdt.empty());
+    CHECK(kdt.size() == 0);
+
+    CHECK(kdt.depth_begin() == kdt.depth_end());
 
     SECTION("insert first point")
     {

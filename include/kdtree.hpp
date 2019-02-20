@@ -166,6 +166,12 @@ public:
         {
         }
 
+        bool
+        operator==(const depth_iterator& other) const
+        {
+            return current_ == other.current_;
+        }
+
     private:
         std::vector<state> depth_stack_;
         kdtree* ref_;
