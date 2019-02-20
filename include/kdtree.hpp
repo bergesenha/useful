@@ -162,6 +162,16 @@ public:
         {
         }
 
+        PointType& operator*()
+        {
+            return ref_->dense_[current_];
+        }
+
+        PointType* operator->()
+        {
+            return &(ref_->dense_[current_]);
+        }
+
         depth_iterator&
         operator++()
         {

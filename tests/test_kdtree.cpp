@@ -26,6 +26,8 @@ TEST_CASE("default construct a kdtree", "[multidim::kdtree]")
         CHECK(kdt.size() == 1);
 
         CHECK(kdt.depth_begin() != kdt.depth_end());
+        CHECK(kdt.depth_begin()->x == Approx(0.0f));
+        CHECK(kdt.depth_begin()->y == Approx(0.0f));
 
         SECTION("increment iterator to first")
         {
@@ -39,6 +41,9 @@ TEST_CASE("default construct a kdtree", "[multidim::kdtree]")
         {
             kdt.insert(point_type{1.0f, -1.0f});
 
+            CHECK(kdt.depth_begin() != kdt.depth_end());
+            CHECK(kdt.depth_begin()->x == Approx(0.0f));
+            CHECK(kdt.depth_begin()->y == Approx(0.0f));
             CHECK(kdt.size() == 2);
         }
     }
