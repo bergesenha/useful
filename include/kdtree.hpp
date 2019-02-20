@@ -170,6 +170,18 @@ public:
                 ++current_;
                 return *this;
             }
+            else
+            {
+                switch(depth_stack_.back())
+                {
+
+                    case state::visited:
+                        // go up to parent and recurse
+                        current_ = ref_->sparse_[current_].parent;
+                        depth_stack_.pop_back();
+                        break;
+                }
+            }
         }
 
         bool
