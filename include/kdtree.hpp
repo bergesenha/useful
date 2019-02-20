@@ -237,6 +237,17 @@ public:
         }
     }
 
+    depth_iterator
+    depth_begin()
+    {
+        return depth_iterator({}, this, 0);
+    }
+
+    depth_iterator
+    depth_end()
+    {
+        return depth_iterator({}, this, sparse_.size());
+    }
 
 private:
     std::vector<PointType> dense_;
