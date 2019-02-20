@@ -142,6 +142,7 @@ public:
     {
         enum class state
         {
+            unvisited,
             smaller_visited,
             visited
         };
@@ -150,7 +151,7 @@ public:
         depth_iterator() = default;
 
         depth_iterator(kdtree* ref, size_type current)
-            : depth_stack_(), ref_(ref), current_(current)
+            : depth_stack_{state::unvisited}, ref_(ref), current_(current)
         {
         }
 
@@ -246,7 +247,7 @@ public:
     depth_iterator
     depth_begin()
     {
-        return depth_iterator({}, this, 0);
+        return depth_iterator(this, 0);
     }
 
     depth_iterator
