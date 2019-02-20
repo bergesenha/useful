@@ -29,6 +29,10 @@ TEST_CASE("default construct a kdtree", "[multidim::kdtree]")
 
         SECTION("increment iterator to first")
         {
+            auto it = kdt.depth_begin();
+            ++it;
+
+            CHECK(it == kdt.depth_end());
         }
 
         SECTION("insert another point")
