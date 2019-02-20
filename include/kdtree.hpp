@@ -179,6 +179,9 @@ public:
                         if(ref_->sparse_[current_].smaller)
                         {
                             // go down smaller branch
+                            current_ = ref_->sparse_[current_].smaller;
+                            depth_stack_.back() = state::smaller_visited;
+                            depth_stack_.push_back(state::unvisited);
                         }
                         else
                         {
@@ -193,6 +196,9 @@ public:
                         if(ref_->sparse_[current_].bigger)
                         {
                             // go down bigger branch
+                            current_ = ref_->sparse_[current_].bigger;
+                            depth_stack_.back() = state::visited;
+                            depth_stack_.push_back(state::unvisited);
                         }
                         else
                         {
