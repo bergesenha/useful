@@ -140,6 +140,12 @@ private:
 public:
     class depth_iterator
     {
+        enum class state
+        {
+            smaller_visited,
+            visited
+        };
+
     public:
         depth_iterator&
         operator++()
@@ -147,6 +153,7 @@ public:
         }
 
     private:
+        std::vector<state> depth_stack_;
         kdtree* ref_;
         size_type current_;
     };
