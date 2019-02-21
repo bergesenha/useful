@@ -192,6 +192,8 @@ public:
                             current_ = ref_->sparse_[current_].smaller;
                             depth_stack_.back() = state::smaller_visited;
                             depth_stack_.push_back(state::unvisited);
+
+                            return *this;
                         }
                         else
                         {
@@ -209,6 +211,8 @@ public:
                             current_ = ref_->sparse_[current_].bigger;
                             depth_stack_.back() = state::visited;
                             depth_stack_.push_back(state::unvisited);
+
+                            return *this;
                         }
                         else
                         {
@@ -226,6 +230,7 @@ public:
                         break;
                 }
             }
+            return *this;
         }
 
         bool

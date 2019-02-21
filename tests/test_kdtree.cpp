@@ -45,6 +45,15 @@ TEST_CASE("default construct a kdtree", "[multidim::kdtree]")
             CHECK(kdt.depth_begin()->x == Approx(0.0f));
             CHECK(kdt.depth_begin()->y == Approx(0.0f));
             CHECK(kdt.size() == 2);
+
+            SECTION("increment iterator to first")
+            {
+                auto it = kdt.depth_begin();
+                ++it;
+
+                CHECK(it->x == Approx(1.0f));
+                CHECK(it->y == Approx(-1.0f));
+            }
         }
     }
 }
