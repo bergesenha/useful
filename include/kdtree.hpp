@@ -177,72 +177,86 @@ public:
         {
             if(depth_stack_.empty())
             {
-                ++current_;
                 return *this;
             }
             else
             {
-                switch(depth_stack_.back())
+                const auto node_state = depth_stack_.back();
+                if(node_state == state::unvisited)
                 {
-                    // go down smaller branch if there is one
-                    case state::unvisited:
-                        if(ref_->sparse_[current_].smaller)
-                        {
-                            // go down smaller branch
-                            current_ = ref_->sparse_[current_].smaller;
-                            depth_stack_.back() = state::smaller_visited;
-                            depth_stack_.push_back(state::unvisited);
+                    if(smaller())
+                    {
+                        depth_stack_.back() = state::smaller_visited;
+                        current_ = smaller();
+                        depth_stack_.push_back(state::unvisited);
 
-                            return *this;
-                        }
-                        else
-                        {
-                            // set smaller as visited and recurse
-                            depth_stack_.back() = state::smaller_visited;
-                            return operator++();
-                        }
-                        break;
-
-                    // go down bigger branch if there is one
-                    case state::smaller_visited:
-                        if(ref_->sparse_[current_].bigger)
-                        {
-                            // go down bigger branch
-                            current_ = ref_->sparse_[current_].bigger;
-                            depth_stack_.back() = state::visited;
-                            depth_stack_.push_back(state::unvisited);
-
-                            return *this;
-                        }
-                        else
-                        {
-                            // set node as visited and recurse
-                            depth_stack_.back() = state::visited;
-                            return operator++();
-                        }
-                        break;
-
-                    case state::visited:
-                        // go up to parent and recurse
-                        current_ = ref_->sparse_[current_].parent;
-                        depth_stack_.pop_back();
+                        return *this;
+                    }
+                    else
+                    {
+                        depth_stack_.back() = state::smaller_visited;
                         return operator++();
-                        break;
+                    }
+                }
+                else if(node_state == state::smaller_visited)
+                {
+                    if(bigger())
+                    {
+                        depth_stack_.back() = state::visited;
+                        depth_stack_.push_back(state::unvisited);
+                        current_ = bigger();
+
+                        return *this;
+                    }
+                    else
+                    {
+                        depth_stack_.pop_back();
+                        current_ = parent();
+                        return operator++();
+                    }
+                }
+                else if(node_state == state::visited)
+                {
+                    depth_stack_.pop_back();
+                    current_ = parent();
+
+                    return operator++();
                 }
             }
+
             return *this;
         }
 
         bool
         operator==(const depth_iterator& other) const
         {
-            return current_ == other.current_;
+            return current_ == other.current_ &&
+                   depth_stack_.empty() == other.depth_stack_.empty();
         }
 
         bool
         operator!=(const depth_iterator& other) const
         {
-            return current_ != other.current_;
+            return current_ != other.current_ ||
+                   depth_stack_.empty() != other.depth_stack_.empty();
+        }
+
+    private:
+        size_type
+        smaller() const
+        {
+            return ref_->sparse_[current_].smaller;
+        }
+        size_type
+        bigger() const
+        {
+            return ref_->sparse_[current_].bigger;
+        }
+
+        size_type
+        parent() const
+        {
+            return ref_->sparse_[current_].parent;
         }
 
     private:
@@ -319,13 +333,20 @@ public:
     depth_iterator
     depth_begin()
     {
-        return depth_iterator(this, 0);
+        if(sparse_.empty())
+        {
+            return depth_iterator({}, this, 0ul);
+        }
+        else
+        {
+            return depth_iterator(this, 0ul);
+        }
     }
 
     depth_iterator
     depth_end()
     {
-        return depth_iterator({}, this, sparse_.size());
+        return depth_iterator({}, this, 0ul);
     }
 
 private:
