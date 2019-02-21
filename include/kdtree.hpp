@@ -17,7 +17,6 @@ public:
     typedef typename std::vector<PointType>::iterator unsorted_iterator;
     typedef
         typename std::vector<PointType>::const_iterator const_unsorted_iterator;
-    typedef PointType value_type;
 
 private:
     struct record
@@ -143,31 +142,95 @@ public:
     {
         enum class state
         {
-            none_visited,
+            unvisited,
             smaller_visited,
-            bigger_visited
+            visited
         };
-
-    public:
-        typedef value_type& reference;
-        typedef value_type* pointer;
 
     public:
         depth_iterator() = default;
 
-        depth_iterator(size_type curr, kdtree* ref)
-            : visit_stack_{state::none_visited}, ref_(ref), current_(curr)
+        depth_iterator(kdtree* ref, size_type current)
+            : depth_stack_{state::unvisited}, ref_(ref), current_(current)
         {
         }
 
-        reference operator*()
+        depth_iterator(const std::vector<state>& depth_stack,
+                       kdtree* ref,
+                       size_type current)
+            : depth_stack_(depth_stack), ref_(ref), current_(current)
+        {
+        }
+
+        PointType& operator*()
         {
             return ref_->dense_[current_];
         }
 
-        pointer operator->()
+        PointType* operator->()
         {
             return &(ref_->dense_[current_]);
+        }
+
+        depth_iterator&
+        operator++()
+        {
+            if(depth_stack_.empty())
+            {
+                ++current_;
+                return *this;
+            }
+            else
+            {
+                switch(depth_stack_.back())
+                {
+                    // go down smaller branch if there is one
+                    case state::unvisited:
+                        if(ref_->sparse_[current_].smaller)
+                        {
+                            // go down smaller branch
+                            current_ = ref_->sparse_[current_].smaller;
+                            depth_stack_.back() = state::smaller_visited;
+                            depth_stack_.push_back(state::unvisited);
+
+                            return *this;
+                        }
+                        else
+                        {
+                            // set smaller as visited and recurse
+                            depth_stack_.back() = state::smaller_visited;
+                            return operator++();
+                        }
+                        break;
+
+                    // go down bigger branch if there is one
+                    case state::smaller_visited:
+                        if(ref_->sparse_[current_].bigger)
+                        {
+                            // go down bigger branch
+                            current_ = ref_->sparse_[current_].bigger;
+                            depth_stack_.back() = state::visited;
+                            depth_stack_.push_back(state::unvisited);
+
+                            return *this;
+                        }
+                        else
+                        {
+                            // set node as visited and recurse
+                            depth_stack_.back() = state::visited;
+                            return operator++();
+                        }
+                        break;
+
+                    case state::visited:
+                        // go up to parent and recurse
+                        current_ = ref_->sparse_[current_].parent;
+                        depth_stack_.pop_back();
+                        return operator++();
+                        break;
+                }
+            }
+            return *this;
         }
 
         bool
@@ -182,53 +245,8 @@ public:
             return current_ != other.current_;
         }
 
-        depth_iterator&
-        operator++()
-        {
-            const record& rec = ref_->sparse_[current_];
-
-            if(visit_stack_.back() == state::smaller_visited)
-            {
-                // down bigger branch
-                visit_stack_.back() = state::bigger_visited;
-                visit_stack_.push_back(state::none_visited);
-                current_ = rec.bigger;
-
-                return *this;
-            }
-
-            if(visit_stack_.back() == state::bigger_visited)
-            {
-                // backtrack
-                current_ = rec.parent;
-                visit_stack_.pop_back();
-
-                while(visit_stack_.back() == state::bigger_visited &&
-                      visit_stack_.empty() != true)
-                {
-                    current_ = ref_->sparse_[current_].parent;
-                    visit_stack_.pop_back();
-                }
-
-                if(visit_stack_.empty())
-                {
-                    current_ = 0;
-                    return *this;
-                }
-
-                return ++(*this);
-            }
-
-            // down smaller branch
-            visit_stack_.back() = state::smaller_visited;
-            visit_stack_.push_back(state::none_visited);
-            current_ = rec.smaller;
-
-            return *this;
-        }
-
     private:
-        std::vector<state> visit_stack_;
+        std::vector<state> depth_stack_;
         kdtree* ref_;
         size_type current_;
     };
@@ -272,18 +290,6 @@ public:
         return dense_.cend();
     }
 
-    depth_iterator
-    depth_begin()
-    {
-        return depth_iterator(0ul, this);
-    }
-
-    depth_iterator
-    depth_end()
-    {
-        return depth_iterator();
-    }
-
     void
     insert(const PointType& pt)
     {
@@ -310,6 +316,17 @@ public:
         }
     }
 
+    depth_iterator
+    depth_begin()
+    {
+        return depth_iterator(this, 0);
+    }
+
+    depth_iterator
+    depth_end()
+    {
+        return depth_iterator({}, this, sparse_.size());
+    }
 
 private:
     std::vector<PointType> dense_;
