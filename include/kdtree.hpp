@@ -48,17 +48,11 @@ public:
     public:
         depth_iterator() = default;
 
-        depth_iterator(kdtree* ref, size_type current)
-            : depth_stack_{state::unvisited}, ref_(ref), current_(current)
-        {
-        }
+        depth_iterator(kdtree* ref, size_type current);
 
         depth_iterator(const std::vector<state>& depth_stack,
                        kdtree* ref,
-                       size_type current)
-            : depth_stack_(depth_stack), ref_(ref), current_(current)
-        {
-        }
+                       size_type current);
 
         PointType& operator*()
         {
@@ -361,6 +355,20 @@ kdtree<PointType>::insert_helper(PointType&& pt,
             sparse_.emplace_back(0ul, 0ul, index);
         }
     }
+}
+
+template <class PointType>
+kdtree<PointType>::depth_iterator::depth_iterator(kdtree* ref,
+                                                  size_type current)
+    : depth_stack_{state::unvisited}, ref_(ref), current_(current)
+{
+}
+
+template <class PointType>
+kdtree<PointType>::depth_iterator::depth_iterator(
+    const std::vector<state>& depth_stack, kdtree* ref, size_type current)
+    : depth_stack_(depth_stack), ref_(ref), current_(current)
+{
 }
 } // namespace multidim
 } // namespace useful
