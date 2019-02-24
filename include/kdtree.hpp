@@ -22,10 +22,7 @@ private:
     struct record
     {
         record() = default;
-        record(size_type small, size_type big, size_type par)
-            : smaller(small), bigger(big), parent(par)
-        {
-        }
+        record(size_type small, size_type big, size_type par);
 
         size_type smaller;
         size_type bigger;
@@ -33,111 +30,10 @@ private:
     };
 
 
-    void
-    insert_helper(const PointType& pt, size_type index, size_type level)
-    {
-        if(level >= point_traits<PointType>::dimensions)
-        {
-            level = 0ul;
-        }
-        else
-        {
-            ++level;
-        }
+    void insert_helper(const PointType& pt, size_type index, size_type level);
 
-        const record& current = sparse_[index];
+    void insert_helper(PointType&& pt, size_type index, size_type level);
 
-        if(less(pt, dense_[index], level))
-        {
-            if(current.smaller)
-            {
-                // recurse
-                insert_helper(pt, current.smaller, level);
-            }
-            else
-            {
-                dense_.push_back(pt);
-                const size_type new_index = dense_.size() - 1;
-                sparse_[index].smaller = new_index;
-                sparse_.emplace_back(0ul, 0ul, index);
-            }
-        }
-        else
-        {
-            if(current.bigger)
-            {
-                insert_helper(pt, current.bigger, level);
-            }
-            else
-            {
-                dense_.push_back(pt);
-                const size_type new_index = dense_.size() - 1;
-                sparse_[index].bigger = new_index;
-                sparse_.emplace_back(0ul, 0ul, index);
-            }
-        }
-    }
-
-    void
-    insert_helper(PointType&& pt, size_type index, size_type level)
-    {
-        if(level >= point_traits<PointType>::dimensions)
-        {
-            level = 0ul;
-        }
-        else
-        {
-            ++level;
-        }
-
-        const record& current = sparse_[index];
-
-        if(less(pt, dense_[index], level))
-        {
-            if(current.smaller)
-            {
-                // recurse
-                insert_helper(std::move(pt), current.smaller, level);
-            }
-            else
-            {
-                dense_.push_back(std::move(pt));
-                const size_type new_index = dense_.size() - 1;
-                sparse_[index].smaller = new_index;
-                sparse_.emplace_back(0ul, 0ul, index);
-            }
-        }
-        else
-        {
-            if(current.bigger)
-            {
-                insert_helper(std::move(pt), current.bigger, level);
-            }
-            else
-            {
-                dense_.push_back(std::move(pt));
-                const size_type new_index = dense_.size() - 1;
-                sparse_[index].bigger = new_index;
-                sparse_.emplace_back(0ul, 0ul, index);
-            }
-        }
-    }
-
-    template <class... RecordArgs>
-    void
-    parallel_push_back(const PointType& pt, RecordArgs&&... rec_args)
-    {
-        dense_.push_back(pt);
-        sparse_.emplace_back(std::forward<RecordArgs>(rec_args)...);
-    }
-
-    template <class... RecordArgs>
-    void
-    parallel_push_back(PointType&& pt, RecordArgs&&... rec_args)
-    {
-        dense_.push_back(std::move(pt));
-        sparse_.emplace_back(std::forward<RecordArgs>(rec_args)...);
-    }
 
 public:
     class depth_iterator
@@ -152,17 +48,11 @@ public:
     public:
         depth_iterator() = default;
 
-        depth_iterator(kdtree* ref, size_type current)
-            : depth_stack_{state::unvisited}, ref_(ref), current_(current)
-        {
-        }
+        depth_iterator(kdtree* ref, size_type current);
 
         depth_iterator(const std::vector<state>& depth_stack,
                        kdtree* ref,
-                       size_type current)
-            : depth_stack_(depth_stack), ref_(ref), current_(current)
-        {
-        }
+                       size_type current);
 
         PointType& operator*()
         {
@@ -174,60 +64,7 @@ public:
             return &(ref_->dense_[current_]);
         }
 
-        depth_iterator&
-        operator++()
-        {
-            if(depth_stack_.empty())
-            {
-                return *this;
-            }
-            else
-            {
-                const auto node_state = depth_stack_.back();
-                if(node_state == state::unvisited)
-                {
-                    if(smaller())
-                    {
-                        depth_stack_.back() = state::smaller_visited;
-                        current_ = smaller();
-                        depth_stack_.push_back(state::unvisited);
-
-                        return *this;
-                    }
-                    else
-                    {
-                        depth_stack_.back() = state::smaller_visited;
-                        return operator++();
-                    }
-                }
-                else if(node_state == state::smaller_visited)
-                {
-                    if(bigger())
-                    {
-                        depth_stack_.back() = state::visited;
-                        depth_stack_.push_back(state::unvisited);
-                        current_ = bigger();
-
-                        return *this;
-                    }
-                    else
-                    {
-                        depth_stack_.pop_back();
-                        current_ = parent();
-                        return operator++();
-                    }
-                }
-                else if(node_state == state::visited)
-                {
-                    depth_stack_.pop_back();
-                    current_ = parent();
-
-                    return operator++();
-                }
-            }
-
-            return *this;
-        }
+        depth_iterator& operator++();
 
         bool
         operator==(const depth_iterator& other) const
@@ -311,7 +148,8 @@ public:
     {
         if(dense_.empty())
         {
-            parallel_push_back(pt, 0ul, 0ul, 0ul);
+            dense_.push_back(pt);
+            sparse_.emplace_back(0ul, 0ul, 0ul);
         }
         else
         {
@@ -324,7 +162,8 @@ public:
     {
         if(dense_.empty())
         {
-            parallel_push_back(std::move(pt), 0ul, 0ul, 0ul);
+            dense_.push_back(std::move(pt));
+            sparse_.emplace_back(0ul, 0ul, 0ul);
         }
         else
         {
@@ -355,5 +194,185 @@ private:
     std::vector<PointType> dense_;
     std::vector<record> sparse_;
 };
+} // namespace multidim
+} // namespace useful
+
+
+namespace useful
+{
+namespace multidim
+{
+template <class PointType>
+kdtree<PointType>::record::record(size_type small, size_type big, size_type par)
+    : smaller(small), bigger(big), parent(par)
+{
+}
+
+template <class PointType>
+void
+kdtree<PointType>::insert_helper(const PointType& pt,
+                                 size_type index,
+                                 size_type level)
+{
+    if(level >= point_traits<PointType>::dimensions)
+    {
+        level = 0ul;
+    }
+    else
+    {
+        ++level;
+    }
+
+    const record& current = sparse_[index];
+
+    if(less(pt, dense_[index], level))
+    {
+        if(current.smaller)
+        {
+            // recurse
+            insert_helper(pt, current.smaller, level);
+        }
+        else
+        {
+            dense_.push_back(pt);
+            const size_type new_index = dense_.size() - 1;
+            sparse_[index].smaller = new_index;
+            sparse_.emplace_back(0ul, 0ul, index);
+        }
+    }
+    else
+    {
+        if(current.bigger)
+        {
+            insert_helper(pt, current.bigger, level);
+        }
+        else
+        {
+            dense_.push_back(pt);
+            const size_type new_index = dense_.size() - 1;
+            sparse_[index].bigger = new_index;
+            sparse_.emplace_back(0ul, 0ul, index);
+        }
+    }
+}
+
+template <class PointType>
+void
+kdtree<PointType>::insert_helper(PointType&& pt,
+                                 size_type index,
+                                 size_type level)
+{
+    if(level >= point_traits<PointType>::dimensions)
+    {
+        level = 0ul;
+    }
+    else
+    {
+        ++level;
+    }
+
+    const record& current = sparse_[index];
+
+    if(less(pt, dense_[index], level))
+    {
+        if(current.smaller)
+        {
+            // recurse
+            insert_helper(std::move(pt), current.smaller, level);
+        }
+        else
+        {
+            dense_.push_back(std::move(pt));
+            const size_type new_index = dense_.size() - 1;
+            sparse_[index].smaller = new_index;
+            sparse_.emplace_back(0ul, 0ul, index);
+        }
+    }
+    else
+    {
+        if(current.bigger)
+        {
+            insert_helper(std::move(pt), current.bigger, level);
+        }
+        else
+        {
+            dense_.push_back(std::move(pt));
+            const size_type new_index = dense_.size() - 1;
+            sparse_[index].bigger = new_index;
+            sparse_.emplace_back(0ul, 0ul, index);
+        }
+    }
+}
+
+template <class PointType>
+kdtree<PointType>::depth_iterator::depth_iterator(kdtree* ref,
+                                                  size_type current)
+    : depth_stack_{state::unvisited}, ref_(ref), current_(current)
+{
+}
+
+template <class PointType>
+kdtree<PointType>::depth_iterator::depth_iterator(
+    const std::vector<state>& depth_stack, kdtree* ref, size_type current)
+    : depth_stack_(depth_stack), ref_(ref), current_(current)
+{
+}
+
+template <class PointType>
+typename kdtree<PointType>::depth_iterator&
+kdtree<PointType>::depth_iterator::operator++()
+{
+    if(depth_stack_.empty())
+    {
+        return *this;
+    }
+    else
+    {
+        const auto node_state = depth_stack_.back();
+        if(node_state == state::unvisited)
+        {
+            if(smaller())
+            {
+                depth_stack_.back() = state::smaller_visited;
+                current_ = smaller();
+                depth_stack_.push_back(state::unvisited);
+
+                return *this;
+            }
+            else
+            {
+                depth_stack_.back() = state::smaller_visited;
+                return operator++();
+            }
+        }
+        else if(node_state == state::smaller_visited)
+        {
+            if(bigger())
+            {
+                depth_stack_.back() = state::visited;
+                depth_stack_.push_back(state::unvisited);
+                current_ = bigger();
+
+                return *this;
+            }
+            else
+            {
+                depth_stack_.pop_back();
+                current_ = parent();
+                return operator++();
+            }
+        }
+        else if(node_state == state::visited)
+        {
+            depth_stack_.pop_back();
+            current_ = parent();
+
+            return operator++();
+        }
+    }
+
+    return *this;
+}
+
 } // namespace multidim
 } // namespace useful
