@@ -34,21 +34,6 @@ private:
 
     void insert_helper(PointType&& pt, size_type index, size_type level);
 
-    template <class... RecordArgs>
-    void
-    parallel_push_back(const PointType& pt, RecordArgs&&... rec_args)
-    {
-        dense_.push_back(pt);
-        sparse_.emplace_back(std::forward<RecordArgs>(rec_args)...);
-    }
-
-    template <class... RecordArgs>
-    void
-    parallel_push_back(PointType&& pt, RecordArgs&&... rec_args)
-    {
-        dense_.push_back(std::move(pt));
-        sparse_.emplace_back(std::forward<RecordArgs>(rec_args)...);
-    }
 
 public:
     class depth_iterator
@@ -222,7 +207,8 @@ public:
     {
         if(dense_.empty())
         {
-            parallel_push_back(pt, 0ul, 0ul, 0ul);
+            dense_.push_back(pt);
+            sparse_.emplace_back(0ul, 0ul, 0ul);
         }
         else
         {
@@ -235,7 +221,8 @@ public:
     {
         if(dense_.empty())
         {
-            parallel_push_back(std::move(pt), 0ul, 0ul, 0ul);
+            dense_.push_back(std::move(pt));
+            sparse_.emplace_back(0ul, 0ul, 0ul);
         }
         else
         {
