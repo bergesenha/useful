@@ -56,10 +56,10 @@ private:
             }
             else
             {
-                // insert leaf
-                const auto smaller_index = dense_.size();
-                parallel_push_back(pt, 0ul, 0ul, current.smaller);
-                sparse_[index].smaller = smaller_index;
+                dense_.push_back(pt);
+                const size_type new_index = dense_.size() - 1;
+                sparse_[index].smaller = new_index;
+                sparse_.emplace_back(0ul, 0ul, index);
             }
         }
         else
@@ -70,9 +70,10 @@ private:
             }
             else
             {
-                const auto bigger_index = dense_.size();
-                parallel_push_back(pt, 0ul, 0ul, current.bigger);
-                sparse_[index].bigger = bigger_index;
+                dense_.push_back(pt);
+                const size_type new_index = dense_.size() - 1;
+                sparse_[index].bigger = new_index;
+                sparse_.emplace_back(0ul, 0ul, index);
             }
         }
     }
@@ -100,10 +101,10 @@ private:
             }
             else
             {
-                // insert leaf
-                const auto smaller_index = dense_.size();
-                parallel_push_back(std::move(pt), 0ul, 0ul, current.smaller);
-                sparse_[index].smaller = smaller_index;
+                dense_.push_back(std::move(pt));
+                const size_type new_index = dense_.size() - 1;
+                sparse_[index].smaller = new_index;
+                sparse_.emplace_back(0ul, 0ul, index);
             }
         }
         else
@@ -114,9 +115,10 @@ private:
             }
             else
             {
-                const auto bigger_index = dense_.size();
-                parallel_push_back(std::move(pt), 0ul, 0ul, current.bigger);
-                sparse_[index].bigger = bigger_index;
+                dense_.push_back(std::move(pt));
+                const size_type new_index = dense_.size() - 1;
+                sparse_[index].bigger = new_index;
+                sparse_.emplace_back(0ul, 0ul, index);
             }
         }
     }
