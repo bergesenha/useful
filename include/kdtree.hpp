@@ -22,10 +22,7 @@ private:
     struct record
     {
         record() = default;
-        record(size_type small, size_type big, size_type par)
-            : smaller(small), bigger(big), parent(par)
-        {
-        }
+        record(size_type small, size_type big, size_type par);
 
         size_type smaller;
         size_type bigger;
@@ -355,5 +352,18 @@ private:
     std::vector<PointType> dense_;
     std::vector<record> sparse_;
 };
+} // namespace multidim
+} // namespace useful
+
+
+namespace useful
+{
+namespace multidim
+{
+template <class PointType>
+kdtree<PointType>::record::record(size_type small, size_type big, size_type par)
+    : smaller(small), bigger(big), parent(par)
+{
+}
 } // namespace multidim
 } // namespace useful
