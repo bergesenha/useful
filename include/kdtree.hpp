@@ -64,60 +64,7 @@ public:
             return &(ref_->dense_[current_]);
         }
 
-        depth_iterator&
-        operator++()
-        {
-            if(depth_stack_.empty())
-            {
-                return *this;
-            }
-            else
-            {
-                const auto node_state = depth_stack_.back();
-                if(node_state == state::unvisited)
-                {
-                    if(smaller())
-                    {
-                        depth_stack_.back() = state::smaller_visited;
-                        current_ = smaller();
-                        depth_stack_.push_back(state::unvisited);
-
-                        return *this;
-                    }
-                    else
-                    {
-                        depth_stack_.back() = state::smaller_visited;
-                        return operator++();
-                    }
-                }
-                else if(node_state == state::smaller_visited)
-                {
-                    if(bigger())
-                    {
-                        depth_stack_.back() = state::visited;
-                        depth_stack_.push_back(state::unvisited);
-                        current_ = bigger();
-
-                        return *this;
-                    }
-                    else
-                    {
-                        depth_stack_.pop_back();
-                        current_ = parent();
-                        return operator++();
-                    }
-                }
-                else if(node_state == state::visited)
-                {
-                    depth_stack_.pop_back();
-                    current_ = parent();
-
-                    return operator++();
-                }
-            }
-
-            return *this;
-        }
+        depth_iterator& operator++();
 
         bool
         operator==(const depth_iterator& other) const
@@ -370,5 +317,62 @@ kdtree<PointType>::depth_iterator::depth_iterator(
     : depth_stack_(depth_stack), ref_(ref), current_(current)
 {
 }
+
+template <class PointType>
+typename kdtree<PointType>::depth_iterator&
+kdtree<PointType>::depth_iterator::operator++()
+{
+    if(depth_stack_.empty())
+    {
+        return *this;
+    }
+    else
+    {
+        const auto node_state = depth_stack_.back();
+        if(node_state == state::unvisited)
+        {
+            if(smaller())
+            {
+                depth_stack_.back() = state::smaller_visited;
+                current_ = smaller();
+                depth_stack_.push_back(state::unvisited);
+
+                return *this;
+            }
+            else
+            {
+                depth_stack_.back() = state::smaller_visited;
+                return operator++();
+            }
+        }
+        else if(node_state == state::smaller_visited)
+        {
+            if(bigger())
+            {
+                depth_stack_.back() = state::visited;
+                depth_stack_.push_back(state::unvisited);
+                current_ = bigger();
+
+                return *this;
+            }
+            else
+            {
+                depth_stack_.pop_back();
+                current_ = parent();
+                return operator++();
+            }
+        }
+        else if(node_state == state::visited)
+        {
+            depth_stack_.pop_back();
+            current_ = parent();
+
+            return operator++();
+        }
+    }
+
+    return *this;
+}
+
 } // namespace multidim
 } // namespace useful
