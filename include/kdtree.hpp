@@ -32,50 +32,7 @@ private:
 
     void insert_helper(const PointType& pt, size_type index, size_type level);
 
-    void
-    insert_helper(PointType&& pt, size_type index, size_type level)
-    {
-        if(level >= point_traits<PointType>::dimensions)
-        {
-            level = 0ul;
-        }
-        else
-        {
-            ++level;
-        }
-
-        const record& current = sparse_[index];
-
-        if(less(pt, dense_[index], level))
-        {
-            if(current.smaller)
-            {
-                // recurse
-                insert_helper(std::move(pt), current.smaller, level);
-            }
-            else
-            {
-                dense_.push_back(std::move(pt));
-                const size_type new_index = dense_.size() - 1;
-                sparse_[index].smaller = new_index;
-                sparse_.emplace_back(0ul, 0ul, index);
-            }
-        }
-        else
-        {
-            if(current.bigger)
-            {
-                insert_helper(std::move(pt), current.bigger, level);
-            }
-            else
-            {
-                dense_.push_back(std::move(pt));
-                const size_type new_index = dense_.size() - 1;
-                sparse_[index].bigger = new_index;
-                sparse_.emplace_back(0ul, 0ul, index);
-            }
-        }
-    }
+    void insert_helper(PointType&& pt, size_type index, size_type level);
 
     template <class... RecordArgs>
     void
@@ -364,6 +321,54 @@ kdtree<PointType>::insert_helper(const PointType& pt,
         else
         {
             dense_.push_back(pt);
+            const size_type new_index = dense_.size() - 1;
+            sparse_[index].bigger = new_index;
+            sparse_.emplace_back(0ul, 0ul, index);
+        }
+    }
+}
+
+template <class PointType>
+void
+kdtree<PointType>::insert_helper(PointType&& pt,
+                                 size_type index,
+                                 size_type level)
+{
+    if(level >= point_traits<PointType>::dimensions)
+    {
+        level = 0ul;
+    }
+    else
+    {
+        ++level;
+    }
+
+    const record& current = sparse_[index];
+
+    if(less(pt, dense_[index], level))
+    {
+        if(current.smaller)
+        {
+            // recurse
+            insert_helper(std::move(pt), current.smaller, level);
+        }
+        else
+        {
+            dense_.push_back(std::move(pt));
+            const size_type new_index = dense_.size() - 1;
+            sparse_[index].smaller = new_index;
+            sparse_.emplace_back(0ul, 0ul, index);
+        }
+    }
+    else
+    {
+        if(current.bigger)
+        {
+            insert_helper(std::move(pt), current.bigger, level);
+        }
+        else
+        {
+            dense_.push_back(std::move(pt));
             const size_type new_index = dense_.size() - 1;
             sparse_[index].bigger = new_index;
             sparse_.emplace_back(0ul, 0ul, index);
