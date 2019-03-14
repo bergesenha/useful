@@ -13,8 +13,10 @@ TEST_CASE("default construct a kdtree", "[multidim::kdtree]")
 {
     kdtree<point_type> kdt;
 
-    REQUIRE(kdt.empty());
-    REQUIRE(kdt.size() == 0);
+    CHECK(kdt.empty());
+    CHECK(kdt.size() == 0);
+
+    CHECK(kdt.depth_begin() == kdt.depth_end());
 
     SECTION("insert first point")
     {
@@ -23,48 +25,41 @@ TEST_CASE("default construct a kdtree", "[multidim::kdtree]")
         CHECK(kdt.empty() == false);
         CHECK(kdt.size() == 1);
 
+        CHECK(kdt.depth_begin() != kdt.depth_end());
+        CHECK(kdt.depth_begin()->x == Approx(0.0f));
+        CHECK(kdt.depth_begin()->y == Approx(0.0f));
+
+        SECTION("increment iterator to first")
+        {
+            auto it = kdt.depth_begin();
+            ++it;
+
+            CHECK(it == kdt.depth_end());
+        }
+
         SECTION("insert another point")
         {
             kdt.insert(point_type{1.0f, -1.0f});
 
+            CHECK(kdt.depth_begin() != kdt.depth_end());
+            CHECK(kdt.depth_begin()->x == Approx(0.0f));
+            CHECK(kdt.depth_begin()->y == Approx(0.0f));
             CHECK(kdt.size() == 2);
 
-            SECTION("get iterator to beginning of tree")
+            SECTION("increment iterator to first")
             {
-                auto iter = kdt.depth_begin();
+                auto it = kdt.depth_begin();
+                ++it;
 
-                CHECK(iter->x == Approx(0.0f));
-                CHECK(iter->y == Approx(0.0f));
+                CHECK(it->x == Approx(1.0f));
+                CHECK(it->y == Approx(-1.0f));
 
-                SECTION("increment iterator")
+                SECTION("increment past end")
                 {
-                    ++iter;
+                    ++it;
 
-                    CHECK(iter->x == Approx(1.0f));
-                    CHECK(iter->y == Approx(-1.0f));
-
-                    SECTION("increment past end")
-                    {
-                        ++iter;
-
-                        CHECK(iter == kdt.depth_end());
-                    }
+                    CHECK(it == kdt.depth_end());
                 }
-            }
-        }
-
-        SECTION("get beginning of depth iteration")
-        {
-            auto iter = kdt.depth_begin();
-
-            CHECK(iter->x == Approx(0.0f));
-            CHECK(iter->y == Approx(0.0f));
-
-            SECTION("increment past end")
-            {
-                ++iter;
-
-                CHECK(iter == kdt.depth_end());
             }
         }
     }
