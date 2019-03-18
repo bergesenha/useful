@@ -20,7 +20,6 @@ public:
     virtual void placement_copy(
         std::aligned_storage_t<sizeof(holder_base*)>* buffer) const = 0;
     virtual ~holder_base() = default;
-    virtual ptr_holder_base* make_value_ptr() = 0;
 };
 
 
@@ -57,8 +56,6 @@ public:
     {
         return value_;
     }
-
-    virtual ptr_holder_base* make_value_ptr() override;
 
 private:
     T value_;
