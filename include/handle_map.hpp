@@ -50,6 +50,36 @@ public:
         return new_handle;
     }
 
+    template <class... Args>
+    handle_type
+    emplace(Args&&... args)
+    {
+        // always insert at end of dense storage
+        dense_.emplace_back(std::forward<Args>(args)...);
+
+        handle_type new_handle;
+        // find new handle
+        if(free_.empty())
+        {
+            // no free handle slots, push back new slot
+            sparse_.push_back(dense_.size() - 1);
+
+
+            new_handle = sparse_.size() - 1;
+        }
+        else
+        {
+            // slot is available for new handle
+            new_handle = free_.back();
+            sparse_[new_handle] = dense_.size() - 1;
+            free_.pop_back();
+        }
+
+        reverse_.push_back(new_handle);
+
+        return new_handle;
+    }
+
 
     void
     erase(handle_type n)
