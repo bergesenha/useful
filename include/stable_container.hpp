@@ -26,7 +26,7 @@ public:
 
 public:
     size_type
-    add(const T& value)
+    push_back(const T& value)
     {
         // check for vacant position
         if(erased_.size())
