@@ -22,4 +22,23 @@ index_sort(Iterator first, Iterator last, IndexIterator index_first)
                   return first[lhs] < first[rhs];
               });
 }
+
+
+template <class Iterator, class IndexIterator, class BinaryPredicate>
+void
+index_sort(Iterator first,
+           Iterator last,
+           IndexIterator index_first,
+           BinaryPredicate fun)
+{
+    typedef typename std::iterator_traits<IndexIterator>::value_type value_type;
+    const auto num_elm = std::distance(first, last);
+    std::iota(index_first, index_first + num_elm, 0);
+
+    std::sort(index_first,
+              index_first + num_elm,
+              [first, &fun](value_type lhs, value_type rhs) {
+                  return fun(first[lhs], first[rhs]);
+              });
+}
 } // namespace useful
