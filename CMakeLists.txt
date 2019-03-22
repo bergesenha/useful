@@ -26,6 +26,7 @@ if(USEFUL_BUILD_TESTS)
         PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/tests/test_ecs.cpp
         PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/tests/test_point_traits.cpp
         PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/tests/test_kd_tree.cpp
+        PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/tests/test_index_sort.cpp
         )
 
     add_executable(perftest ${CMAKE_CURRENT_SOURCE_DIR}/tests/perftest.cpp)
