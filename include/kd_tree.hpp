@@ -39,6 +39,11 @@ template <class PointType, std::size_t... Sequence>
 struct unwrap<PointType, std::index_sequence<Sequence...>>
     : index<PointType, Sequence>...
 {
+    template <class RandomAccessIterator>
+    unwrap(RandomAccessIterator first, RandomAccessIterator last)
+        : index<PointType, Sequence>(first, last)...
+    {
+    }
 };
 
 template <class PointType>
@@ -48,6 +53,9 @@ struct super_index
 {
     template <class RandomAccessIterator>
     super_index(RandomAccessIterator first, RandomAccessIterator last)
+        : unwrap<PointType,
+                 std::make_index_sequence<point_traits<PointType>::dimensions>>(
+              first, last)
     {
     }
 };
