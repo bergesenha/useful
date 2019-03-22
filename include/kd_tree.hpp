@@ -3,6 +3,7 @@
 #include <vector>
 #include <algorithm>
 #include "point_traits.hpp"
+#include "index_sort.hpp"
 
 
 namespace useful
@@ -16,6 +17,19 @@ namespace kd_tree_detail
 template <class PointType, std::size_t Dim>
 struct index
 {
+    template <class RandomAccessIterator>
+    index(RandomAccessIterator first, RandomAccessIterator last)
+    {
+        index_sort(first,
+                   last,
+                   order.begin(),
+                   [](const PointType& lhs, const PointType& rhs) {
+                       return point_traits<PointType>::get<Dim>(lhs) <
+                              point_traits<PointType>::get<Dim>(rhs);
+                   });
+    }
+
+    std::vector<std::size_t> order;
 };
 
 template <class PointType, class IndexSequence>
@@ -32,6 +46,10 @@ struct super_index
     : unwrap<PointType,
              std::make_index_sequence<point_traits<PointType>::dimensions>>
 {
+    template <class RandomAccessIterator>
+    super_index(RandomAccessIterator first, RandomAccessIterator last)
+    {
+    }
 };
 
 } // namespace kd_tree_detail
