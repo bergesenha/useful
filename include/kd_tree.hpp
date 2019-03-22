@@ -9,6 +9,33 @@ namespace useful
 {
 namespace multidim
 {
+
+namespace kd_tree_detail
+{
+
+template <class PointType, std::size_t Dim>
+struct index
+{
+};
+
+template <class PointType, class IndexSequence>
+struct unwrap;
+
+template <class PointType, std::size_t... Sequence>
+struct unwrap<PointType, std::index_sequence<Sequence...>>
+    : index<PointType, Sequence>...
+{
+};
+
+template <class PointType>
+struct super_index
+    : unwrap<PointType,
+             std::make_index_sequence<point_traits<PointType>::dimensions>>
+{
+};
+
+} // namespace kd_tree_detail
+
 template <class PointType>
 class kd_tree
 {
@@ -36,9 +63,6 @@ public:
     template <class Iterator>
     kd_tree(Iterator first, Iterator last) : storage_()
     {
-        if(first != last)
-        {
-        }
     }
 
 private:
