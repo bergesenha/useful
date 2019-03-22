@@ -8,14 +8,14 @@ struct point_type
     float y;
 };
 
-static const std::vector<point_type> data{
-    {1.0f, 2.0f}, {3.0f, 1.0f}, {0.0f, 4.0f}, {2.0f, 0.0f}};
-
 
 using useful::multidim::kd_tree;
 
 TEST_CASE("construct 'index' helper class", "[multidim::kd_tree_detail::index]")
 {
+    const std::vector<point_type> data{
+        {1.0f, 2.0f}, {3.0f, 1.0f}, {0.0f, 4.0f}, {2.0f, 0.0f}};
+
     useful::multidim::kd_tree_detail::index<point_type, 0> index0(data.begin(),
                                                                   data.end());
     useful::multidim::kd_tree_detail::index<point_type, 1> index1(data.begin(),
@@ -31,3 +31,19 @@ TEST_CASE("construct 'index' helper class", "[multidim::kd_tree_detail::index]")
     CHECK(index1.order[2] == 0);
     CHECK(index1.order[3] == 2);
 }
+
+TEST_CASE("construct 'unwrap' helper class",
+          "[multidim::kd_tree_detail::unwrap]")
+{
+    const std::vector<point_type> data{
+        {1.0f, 2.0f}, {3.0f, 1.0f}, {0.0f, 4.0f}, {2.0f, 0.0f}};
+
+    useful::multidim::kd_tree_detail::unwrap<
+        point_type,
+        std::make_index_sequence<
+            useful::multidim::point_traits<point_type>::dimensions>>
+        uw(data.begin(), data.end());
+
+    (void)uw;
+}
+
