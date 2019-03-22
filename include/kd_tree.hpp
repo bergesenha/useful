@@ -19,13 +19,14 @@ struct index
 {
     template <class RandomAccessIterator>
     index(RandomAccessIterator first, RandomAccessIterator last)
+        : order(std::distance(first, last))
     {
         index_sort(first,
                    last,
                    order.begin(),
                    [](const PointType& lhs, const PointType& rhs) {
-                       return point_traits<PointType>::get<Dim>(lhs) <
-                              point_traits<PointType>::get<Dim>(rhs);
+                       return point_traits<PointType>::template get<Dim>(lhs) <
+                              point_traits<PointType>::template get<Dim>(rhs);
                    });
     }
 
@@ -89,6 +90,7 @@ public:
     template <class Iterator>
     kd_tree(Iterator first, Iterator last) : storage_()
     {
+        kd_tree_detail::super_index<PointType> s_index(first, last);
     }
 
 private:

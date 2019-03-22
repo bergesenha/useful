@@ -14,10 +14,8 @@ static const std::vector<point_type> data{
 
 using useful::multidim::kd_tree;
 
-
-TEST_CASE("default construct a kd_tree", "[multidim::kd_tree]")
+TEST_CASE("construct 'index' helper class", "[multidim::kd_tree_detail::index]")
 {
-    kd_tree<point_type> kdt(data.cbegin(), data.cend());
-
-    (void)kdt;
+    useful::multidim::kd_tree_detail::index<point_type, 0> index0(data.begin(),
+                                                                  data.end());
 }
