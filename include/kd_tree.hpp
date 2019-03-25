@@ -11,58 +11,6 @@ namespace useful
 namespace multidim
 {
 
-namespace kd_tree_detail
-{
-
-template <class PointType, std::size_t Dim>
-struct index
-{
-    template <class RandomAccessIterator>
-    index(RandomAccessIterator first, RandomAccessIterator last)
-        : order(std::distance(first, last))
-    {
-        index_sort(first,
-                   last,
-                   order.begin(),
-                   [](const PointType& lhs, const PointType& rhs) {
-                       return point_traits<PointType>::template get<Dim>(lhs) <
-                              point_traits<PointType>::template get<Dim>(rhs);
-                   });
-    }
-
-    std::vector<std::size_t> order;
-};
-
-template <class PointType, class IndexSequence>
-struct unwrap;
-
-template <class PointType, std::size_t... Sequence>
-struct unwrap<PointType, std::index_sequence<Sequence...>>
-    : index<PointType, Sequence>...
-{
-    template <class RandomAccessIterator>
-    unwrap(RandomAccessIterator first, RandomAccessIterator last)
-        : index<PointType, Sequence>(first, last)...
-    {
-    }
-};
-
-template <class PointType>
-struct super_index
-    : unwrap<PointType,
-             std::make_index_sequence<point_traits<PointType>::dimensions>>
-{
-    template <class RandomAccessIterator>
-    super_index(RandomAccessIterator first, RandomAccessIterator last)
-        : unwrap<PointType,
-                 std::make_index_sequence<point_traits<PointType>::dimensions>>(
-              first, last)
-    {
-    }
-};
-
-} // namespace kd_tree_detail
-
 template <class PointType>
 class kd_tree
 {
@@ -90,7 +38,6 @@ public:
     template <class Iterator>
     kd_tree(Iterator first, Iterator last) : storage_()
     {
-        kd_tree_detail::super_index<PointType> s_index(first, last);
     }
 
 private:
