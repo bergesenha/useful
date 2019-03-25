@@ -38,6 +38,7 @@ public:
     template <class Iterator>
     kd_tree(Iterator first, Iterator last) : storage_()
     {
+        std::for_each(first, last, [this](const PointType& pt) { insert(pt); });
     }
 
 
