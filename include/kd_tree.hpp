@@ -40,6 +40,14 @@ public:
     {
     }
 
+
+    void
+    insert(const PointType& pt)
+    {
+        size_type current_index = 0ul;
+        size_type level = 0ul;
+    }
+
 private:
     std::vector<record> storage_;
 };
