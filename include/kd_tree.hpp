@@ -44,8 +44,55 @@ public:
     void
     insert(const PointType& pt)
     {
-        size_type current_index = 0ul;
+        if(storage_.empty())
+        {
+            storage_.emplace_back(pt, 0ul, 0ul, 0ul);
+            return;
+        }
+
+        // start at root node
+        size_type current = 0ul;
         size_type level = 0ul;
+        bool point_inserted = false;
+
+        while(!point_inserted)
+        {
+            // cycle back to first dimension again
+            if(level == point_traits<PointType>::dimensions)
+            {
+                level = 0ul;
+            }
+
+            // compare point to current node
+            if(less(pt, storage_[current].value, level)) // smaller
+            {
+                if(storage_[current].smaller != 0ul) // has smaller child
+                {
+                    current = storage_[current].smaller;
+                }
+                else // leaf node found
+                {
+                    storage_.emplace_back(pt, current, 0ul, 0ul);
+                    storage_[current].smaller = storage_.size() - 1;
+                    point_inserted = true;
+                }
+            }
+            else // bigger or equal
+            {
+                if(storage_[current].bigger != 0ul)
+                {
+                    current = storage_[current].bigger;
+                }
+                else
+                {
+                    storage_.emplace_back(pt, current, 0ul, 0ul);
+                    storage_[current].bigger = storage_.size() - 1;
+                    point_inserted = true;
+                }
+            }
+
+            ++level;
+        }
     }
 
 private:
