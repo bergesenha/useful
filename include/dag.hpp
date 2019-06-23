@@ -16,6 +16,7 @@ public:
     dag() = default;
 
     size_type insert(const T& node);
+    void remove(size_type node_id);
 
     void link(size_type from, size_type to);
 
@@ -44,5 +45,14 @@ dag<T>::link(typename dag<T>::size_type from, typename dag<T>::size_type to)
 {
     from_links_[from].push_back(to);
     to_links_[to].push_back(from);
+}
+
+template <class T>
+void
+dag<T>::remove(typename dag<T>::size_type node_id)
+{
+    nodes_.erase(node_id);
+    from_links_.erase(node_id);
+    to_links_.erase(node_id);
 }
 } // namespace useful
