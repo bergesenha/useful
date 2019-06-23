@@ -19,6 +19,7 @@ public:
     void remove(size_type node_id);
 
     void link(size_type from, size_type to);
+    void unlink(size_type from, size_type to);
 
 private:
     stable_vector<T> nodes_;
@@ -45,6 +46,20 @@ dag<T>::link(typename dag<T>::size_type from, typename dag<T>::size_type to)
 {
     from_links_[from].push_back(to);
     to_links_[to].push_back(from);
+}
+
+template <class T>
+void
+dag<T>::unlink(typename dag<T>::size_type from, typename dag<T>::size_type to)
+{
+    auto from_it = &from_links_[from][0];
+    auto found_from =
+        std::find(from_it, from_it + from_links_[from].size(), to);
+    from_links_[from].erase(found_from);
+
+    auto to_it = &to_links_[to][0];
+    auto found_to = std::find(to_it, to_it + to_links_[to].size(), from);
+    to_links_[to].erase(found_to);
 }
 
 template <class T>
