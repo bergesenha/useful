@@ -1,5 +1,9 @@
 #pragma once
 
+#include <utility>
+#include <iterator>
+#include <algorithm>
+
 #include "stable_container.hpp"
 #include "small_vector.hpp"
 
@@ -18,6 +22,9 @@ public:
 
     class link_iterator
     {
+    public:
+        typedef std::ptrdiff_t difference_type;
+
     public:
         link_iterator() = default;
 
@@ -47,6 +54,12 @@ public:
             return temp;
         }
 
+        difference_type
+        operator-(const link_iterator& other) const
+        {
+            return index_ - other.index_;
+        }
+
 
     private:
         dag* ref_;
@@ -74,6 +87,10 @@ private:
     stable_vector<small_vector<size_type>> from_links_;
     stable_vector<small_vector<size_type>> to_links_;
 };
+
+template <class T>
+using link_iterator = typename dag<T>::link_iterator;
+
 } // namespace useful
 
 
@@ -114,9 +131,26 @@ template <class T>
 void
 dag<T>::remove(typename dag<T>::size_type node_id)
 {
-    nodes_.erase(node_id);
+    std::for_each(from_links_[node_id].begin(),
+                  from_links_[node_id].end(),
+                  [this, node_id](size_type parent_id) {
+                      auto found = std::find(to_links_[parent_id].begin(),
+                                             to_links_[parent_id].end(),
+                                             node_id);
+                      to_links_[parent_id].erase(found);
+                  });
+    std::for_each(to_links_[node_id].begin(),
+                  to_links_[node_id].end(),
+                  [this, node_id](size_type child_id) {
+                      auto found = std::find(from_links_[child_id].begin(),
+                                             from_links_[child_id].end(),
+                                             node_id);
+                      from_links_[child_id].erase(found);
+                  });
+
     from_links_.erase(node_id);
     to_links_.erase(node_id);
+    nodes_.erase(node_id);
 }
 
 template <class T>

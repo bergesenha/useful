@@ -36,6 +36,17 @@ TEST_CASE("default constructed dag", "[dag]")
                     auto parent_its = dg.parents(node2);
                     CHECK(*parent_its.first == 'a');
                 }
+
+                SECTION("remove node1")
+                {
+                    dg.remove(node1);
+
+                    SECTION("node2 should have no parents")
+                    {
+                        auto parent_it = dg.parents(node2);
+                        CHECK(parent_it.second - parent_it.first == 0);
+                    }
+                }
             }
         }
     }
