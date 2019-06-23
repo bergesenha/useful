@@ -16,6 +16,21 @@ public:
     typedef T& reference;
     typedef const T& const_reference;
 
+    class link_iterator
+    {
+    public:
+        link_iterator() = default;
+
+        link_iterator(dag& dg, small_vector<size_type>& links)
+            : ref_(&dg), link_ref_(&links)
+        {
+        }
+
+    private:
+        dag* ref_;
+        small_vector<size_type>* link_ref_;
+    };
+
 public:
     dag() = default;
 
