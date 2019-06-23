@@ -15,6 +15,8 @@ public:
 public:
     dag() = default;
 
+    size_type size() const;
+
     size_type insert(const T& node);
     void remove(size_type node_id);
 
@@ -69,5 +71,12 @@ dag<T>::remove(typename dag<T>::size_type node_id)
     nodes_.erase(node_id);
     from_links_.erase(node_id);
     to_links_.erase(node_id);
+}
+
+template <class T>
+typename dag<T>::size_type
+dag<T>::size() const
+{
+    return nodes_.size();
 }
 } // namespace useful
