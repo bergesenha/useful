@@ -32,6 +32,21 @@ public:
             return ref_->nodes_[node_index];
         }
 
+        link_iterator&
+        operator++()
+        {
+            ++index_;
+            return *this;
+        }
+
+        link_iterator
+        operator++(int)
+        {
+            auto temp = *this;
+            ++(*this);
+            return temp;
+        }
+
 
     private:
         dag* ref_;
