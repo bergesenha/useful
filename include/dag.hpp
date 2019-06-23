@@ -11,6 +11,10 @@ class dag
 {
 public:
     typedef typename stable_vector<T>::size_type size_type;
+    typedef std::ptrdiff_t difference_type;
+    typedef T value_type;
+    typedef T& reference;
+    typedef const T& const_reference;
 
 public:
     dag() = default;
@@ -22,6 +26,7 @@ public:
 
     void link(size_type from, size_type to);
     void unlink(size_type from, size_type to);
+
 
 private:
     stable_vector<T> nodes_;
