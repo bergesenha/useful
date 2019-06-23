@@ -66,6 +66,8 @@ public:
     void unlink(size_type from, size_type to);
 
     std::pair<link_iterator, link_iterator> children(size_type node_id);
+    std::pair<link_iterator, link_iterator> parents(size_type node_id);
+
 
 private:
     stable_vector<T> nodes_;
@@ -133,6 +135,16 @@ dag<T>::children(size_type node_id)
                           link_iterator(*this,
                                         from_links_[node_id],
                                         from_links_[node_id].size()));
+}
+
+
+template <class T>
+std::pair<typename dag<T>::link_iterator, typename dag<T>::link_iterator>
+dag<T>::parents(size_type node_id)
+{
+    return std::make_pair(
+        link_iterator(*this, to_links_[node_id], 0),
+        link_iterator(*this, to_links_[node_id], to_links_[node_id].size()));
 }
 
 } // namespace useful

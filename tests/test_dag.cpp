@@ -30,6 +30,12 @@ TEST_CASE("default constructed dag", "[dag]")
                     auto children_ts = dg.children(node1);
                     CHECK(*children_ts.first == 'b');
                 }
+
+                SECTION("parent of node2 should be node1")
+                {
+                    auto parent_its = dg.parents(node2);
+                    CHECK(*parent_its.first == 'a');
+                }
             }
         }
     }
