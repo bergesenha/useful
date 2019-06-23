@@ -21,14 +21,22 @@ public:
     public:
         link_iterator() = default;
 
-        link_iterator(dag& dg, small_vector<size_type>& links)
-            : ref_(&dg), link_ref_(&links)
+        link_iterator(dag& dg, small_vector<size_type>& links, size_type index)
+            : ref_(&dg), link_ref_(&links), index_(index)
         {
         }
+
+        reference operator*()
+        {
+            const auto node_index = link_ref_->operator[](index_);
+            return ref_->nodes_[node_index];
+        }
+
 
     private:
         dag* ref_;
         small_vector<size_type>* link_ref_;
+        size_type index_;
     };
 
 public:
@@ -42,6 +50,7 @@ public:
     void link(size_type from, size_type to);
     void unlink(size_type from, size_type to);
 
+    std::pair<link_iterator, link_iterator> children(size_type node_id);
 
 private:
     stable_vector<T> nodes_;
@@ -99,4 +108,16 @@ dag<T>::size() const
 {
     return nodes_.size();
 }
+
+
+template <class T>
+std::pair<typename dag<T>::link_iterator, typename dag<T>::link_iterator>
+dag<T>::children(size_type node_id)
+{
+    return std::make_pair(link_iterator(*this, from_links_[node_id], 0),
+                          link_iterator(*this,
+                                        from_links_[node_id],
+                                        from_links_[node_id].size()));
+}
+
 } // namespace useful

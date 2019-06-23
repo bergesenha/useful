@@ -24,6 +24,12 @@ TEST_CASE("default constructed dag", "[dag]")
             SECTION("link 2 nodes")
             {
                 dg.link(node1, node2);
+
+                SECTION("children of node1 should be node2")
+                {
+                    auto children_ts = dg.children(node1);
+                    CHECK(*children_ts.first == 'b');
+                }
             }
         }
     }
