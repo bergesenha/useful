@@ -16,7 +16,7 @@ class dag;
 
 
 template <class T>
-class link_iterator
+class link_iterator_
 {
 public:
     typedef typename stable_vector<T>::size_type size_type;
@@ -28,12 +28,12 @@ public:
     typedef const T& const_reference;
 
 public:
-    link_iterator() = default;
-    link_iterator(dag<T>& dg, small_vector<size_type>& links, size_type index);
+    link_iterator_() = default;
+    link_iterator_(dag<T>& dg, small_vector<size_type>& links, size_type index);
     reference operator*();
-    link_iterator& operator++();
-    link_iterator operator++(int);
-    difference_type operator-(const link_iterator& other) const;
+    link_iterator_& operator++();
+    link_iterator_ operator++(int);
+    difference_type operator-(const link_iterator_& other) const;
 
 private:
     dag<T>* ref_;
@@ -44,6 +44,8 @@ private:
 template <class T>
 class dag
 {
+    friend class link_iterator_<T>;
+
 public:
     typedef typename stable_vector<T>::size_type size_type;
     typedef std::ptrdiff_t difference_type;
@@ -51,52 +53,7 @@ public:
     typedef T& reference;
     typedef const T& const_reference;
 
-    class link_iterator
-    {
-    public:
-        typedef std::ptrdiff_t difference_type;
-
-    public:
-        link_iterator() = default;
-
-        link_iterator(dag& dg, small_vector<size_type>& links, size_type index)
-            : ref_(&dg), link_ref_(&links), index_(index)
-        {
-        }
-
-        reference operator*()
-        {
-            const auto node_index = link_ref_->operator[](index_);
-            return ref_->nodes_[node_index];
-        }
-
-        link_iterator&
-        operator++()
-        {
-            ++index_;
-            return *this;
-        }
-
-        link_iterator
-        operator++(int)
-        {
-            auto temp = *this;
-            ++(*this);
-            return temp;
-        }
-
-        difference_type
-        operator-(const link_iterator& other) const
-        {
-            return index_ - other.index_;
-        }
-
-
-    private:
-        dag* ref_;
-        small_vector<size_type>* link_ref_;
-        size_type index_;
-    };
+    typedef link_iterator_<T> link_iterator;
 
 public:
     dag() = default;
@@ -210,31 +167,31 @@ dag<T>::parents(size_type node_id)
 }
 
 template <class T>
-link_iterator<T>::link_iterator(dag<T>& dg,
-                                small_vector<size_type>& links,
-                                size_type index)
+link_iterator_<T>::link_iterator_(dag<T>& dg,
+                                  small_vector<size_type>& links,
+                                  size_type index)
     : ref_(&dg), link_ref_(&links), index_(index)
 {
 }
 
 template <class T>
-typename link_iterator<T>::reference link_iterator<T>::operator*()
+typename link_iterator_<T>::reference link_iterator_<T>::operator*()
 {
     const auto node_index = link_ref_->operator[](index_);
     return ref_->nodes_[node_index];
 }
 
 template <class T>
-link_iterator<T>&
-link_iterator<T>::operator++()
+link_iterator_<T>&
+link_iterator_<T>::operator++()
 {
     ++index_;
     return *this;
 }
 
 template <class T>
-link_iterator<T>
-link_iterator<T>::operator++(int)
+link_iterator_<T>
+link_iterator_<T>::operator++(int)
 {
     auto temp = *this;
     ++(*this);
@@ -242,8 +199,8 @@ link_iterator<T>::operator++(int)
 }
 
 template <class T>
-typename link_iterator<T>::difference_type
-link_iterator<T>::operator-(const link_iterator& other) const
+typename link_iterator_<T>::difference_type
+link_iterator_<T>::operator-(const link_iterator_& other) const
 {
     return index_ - other.index_;
 }
@@ -252,12 +209,12 @@ link_iterator<T>::operator-(const link_iterator& other) const
 namespace std
 {
 template <class T>
-struct iterator_traits<useful::link_iterator<T>>
+struct iterator_traits<useful::link_iterator_<T>>
 {
-    typedef typename useful::link_iterator<T>::difference_type difference_type;
-    typedef typename useful::link_iterator<T>::value_type value_type;
-    typedef typename useful::link_iterator<T>::pointer pointer;
-    typedef typename useful::link_iterator<T>::reference reference;
+    typedef typename useful::link_iterator_<T>::difference_type difference_type;
+    typedef typename useful::link_iterator_<T>::value_type value_type;
+    typedef typename useful::link_iterator_<T>::pointer pointer;
+    typedef typename useful::link_iterator_<T>::reference reference;
     typedef std::bidirectional_iterator_tag iterator_category;
 };
 } // namespace std
