@@ -33,6 +33,8 @@ public:
     reference operator*();
     link_iterator_& operator++();
     link_iterator_ operator++(int);
+    link_iterator_& operator--();
+    link_iterator_ operator--(int);
     difference_type operator-(const link_iterator_& other) const;
     bool operator!=(const link_iterator_& other) const;
 
@@ -213,6 +215,24 @@ link_iterator_<T>::operator!=(const link_iterator_& other) const
     return index_ != other.index_ || link_ref_ != other.link_ref_ ||
            ref_ != other.ref_;
 }
+
+template <class T>
+link_iterator_<T>&
+link_iterator_<T>::operator--()
+{
+    --index_;
+    return *this;
+}
+
+template <class T>
+link_iterator_<T>
+link_iterator_<T>::operator--(int)
+{
+    auto temp = *this;
+    --(*this);
+    return temp;
+}
+
 } // namespace useful
 
 namespace std
