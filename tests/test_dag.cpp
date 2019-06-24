@@ -34,6 +34,8 @@ TEST_CASE("default constructed dag", "[dag]")
                 SECTION("parent of node2 should be node1")
                 {
                     auto parent_its = dg.parents(node2);
+                    CHECK(std::distance(parent_its.first, parent_its.second) ==
+                          1);
                     CHECK(*parent_its.first == 'a');
                 }
 
@@ -44,7 +46,8 @@ TEST_CASE("default constructed dag", "[dag]")
                     SECTION("node2 should have no parents")
                     {
                         auto parent_it = dg.parents(node2);
-                        CHECK(parent_it.second - parent_it.first == 0);
+                        CHECK(std::distance(parent_it.first,
+                                            parent_it.second) == 0);
                     }
                 }
             }

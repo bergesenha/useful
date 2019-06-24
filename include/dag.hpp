@@ -34,6 +34,7 @@ public:
     link_iterator_& operator++();
     link_iterator_ operator++(int);
     difference_type operator-(const link_iterator_& other) const;
+    bool operator!=(const link_iterator_& other) const;
 
 private:
     dag<T>* ref_;
@@ -203,6 +204,14 @@ typename link_iterator_<T>::difference_type
 link_iterator_<T>::operator-(const link_iterator_& other) const
 {
     return index_ - other.index_;
+}
+
+template <class T>
+bool
+link_iterator_<T>::operator!=(const link_iterator_& other) const
+{
+    return index_ != other.index_ || link_ref_ != other.link_ref_ ||
+           ref_ != other.ref_;
 }
 } // namespace useful
 
