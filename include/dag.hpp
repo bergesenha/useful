@@ -31,6 +31,7 @@ public:
     link_iterator_() = default;
     link_iterator_(dag<T>& dg, small_vector<size_type>& links, size_type index);
     reference operator*();
+    pointer operator->();
     link_iterator_& operator++();
     link_iterator_ operator++(int);
     link_iterator_& operator--();
@@ -231,6 +232,12 @@ link_iterator_<T>::operator--(int)
     auto temp = *this;
     --(*this);
     return temp;
+}
+
+template <class T>
+typename link_iterator_<T>::pointer link_iterator_<T>::operator->()
+{
+    return &(operator*());
 }
 
 } // namespace useful
